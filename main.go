@@ -1,7 +1,7 @@
 package main
 
 import (
-	MC "CLI/MC"
+	"CLI/MCommands"
 	misc "CLI/Misc"
 	"CLI/s7cli/commands"
 	"fmt"
@@ -11,7 +11,7 @@ import (
 
 var (
 	f_  = misc.Funcs{}
-	MC_ = MC.MC{}
+	MC_ = MCommands.MC{}
 )
 
 // import (

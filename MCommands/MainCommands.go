@@ -1,4 +1,4 @@
-package MC
+package MCommands
 
 import (
 	HugginFace "CLI/HugAI"
@@ -15,6 +15,8 @@ import (
 	"runtime"
 	"strconv"
 	"strings"
+
+	"github.com/charmbracelet/huh"
 )
 
 type MC struct {
@@ -406,20 +408,41 @@ func (m *MC) Init(h commands.Handler) commands.Handler {
 							Name:        ">" + strconv.Itoa(i),
 							Description: resp.Results[i].Title,
 							Exec: func(input []string, this commands.Command) error {
-								DefaultHandlerx5.Handle("clear")
+								h.Handle("clear")
+
 								title_ := resp.Results[i].Title
-								fmt.Println("> " + title_)
-								fmt.Println("==============================================================")
-								fmt.Println("https://vidsrc.xyz/embed/movie?tmdb=" + strconv.Itoa(resp.Results[i].Id))
-								fmt.Println("==============================================================")
-								fmt.Println("==============================================================")
-								fmt.Println("https://vidsrc.net/embed/movie?tmdb=" + strconv.Itoa(resp.Results[i].Id))
-								fmt.Println("==============================================================")
-								fmt.Println("==============================================================")
-								fmt.Println("https://vidsrc.in/embed/movie?tmdb=" + strconv.Itoa(resp.Results[i].Id))
-								fmt.Println("==============================================================")
+								list_ := []string{"https://vidsrc.xyz/embed/movie?tmdb=" + strconv.Itoa(resp.Results[i].Id), "https://vidsrc.in/embed/movie?tmdb=" + strconv.Itoa(resp.Results[i].Id), "https://vidsrc.net/embed/movie?tmdb=" + strconv.Itoa(resp.Results[i].Id)}
+
 								poster := "https://image.tmdb.org/t/p/original" + resp.Results[i].Poster_path
 								image_format := poster[len(poster)-3:]
+								var source_url string
+								var yN bool
+								// var base *huh.Theme = huh.ThemeBase()
+								var dracula *huh.Theme = huh.ThemeCharm()
+								// var base16 *huh.Theme = huh.ThemeBase16()
+								// var charm *huh.Theme = huh.ThemeCharm()
+								// var catppuccin *huh.Theme = huh.ThemeCatppuccin()
+								form := huh.NewForm(
+									huh.NewGroup(
+										huh.NewSelect[string]().
+											Options(huh.NewOptions(list_...)...).
+											Title(title_).Value(&source_url),
+										huh.NewConfirm().
+											Title("Are you sure? ").
+											Description("Please confirm. ").
+											Affirmative("Yes!").
+											Negative("No.").
+											Inline(true).
+											Value(&yN),
+									),
+								).WithAccessible(true).WithTheme(dracula)
+
+								err := form.Run()
+								if err != nil {
+									log.Fatal(err)
+								}
+								// fmt.Println("> " + source_url)
+
 								if image_format == "jpg" || image_format == "png" {
 									fmt.Println("Poster: " + poster)
 								} else {
@@ -427,31 +450,16 @@ func (m *MC) Init(h commands.Handler) commands.Handler {
 								}
 								//imageb64 := f_.ImageURLToBase64(poster)
 								//img(image_format, title_, imageb64)
+								if yN {
+									f_.OpenUrl(source_url)
+								}
 								internal_handler := commands.DefaultHandler
-								internal_handler.SetPrompt("Movie Search Results > ")
+								internal_handler.SetPrompt("Back? > ")
 								internal_handler.AddCommand(commands.Command{
 									Name:        "exit",
 									Description: "Exit back to the main cli",
 								})
-								list_ := []string{"https://vidsrc.xyz/embed/movie?tmdb=" + strconv.Itoa(resp.Results[i].Id), "https://vidsrc.in/embed/movie?tmdb=" + strconv.Itoa(resp.Results[i].Id), "https://vidsrc.net/embed/movie?tmdb=" + strconv.Itoa(resp.Results[i].Id)}
 
-								for i := range list_ {
-									internal_handler.AddCommand(commands.Command{
-										Name:        ">" + strconv.Itoa(i),
-										Description: list_[i],
-										Exec: func(input []string, this commands.Command) error {
-											DefaultHandlerx5.Handle("clear")
-											fmt.Println("> " + list_[i])
-											fmt.Println("==============================================================")
-											f_.OpenUrl(list_[i])
-
-											return nil
-										},
-									})
-
-								}
-								fmt.Println("Press tab to get the list of results")
-								internal_handler.SetPrompt("Movie Search Results > ")
 								message := internal_handler.GetInput()
 								if message == "exit" {
 									return nil

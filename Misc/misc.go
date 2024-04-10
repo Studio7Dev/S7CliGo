@@ -204,7 +204,7 @@ func (f Funcs) OpenUrl(url string) {
 		fmt.Printf("Error occurred starting the command '%s'. Error:\n%s", strings.Join(cmdArgs, " "), err.Error())
 		fmt.Println("\nOutput:", string(output[:]))
 	} else {
-		fmt.Printf("Successfully started command '%s'\n", strings.Join(cmdArgs, " "))
+		// fmt.Printf("Successfully started command '%s'\n", strings.Join(cmdArgs, " "))
 	}
 }
 
