@@ -1,4 +1,4 @@
-# S7 Beta CLI (Command Line Interface)
+# S7 Beta CLI (Command Line Interface) [Developer Version]
 
 
 A powerful and customizable command line interface with various features and integrations.
