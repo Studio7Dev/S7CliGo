@@ -2,16 +2,17 @@ package main
 
 import (
 	"fmt"
-	app_commands "github.com/Studio7Dev/S7CliGo/cmd"
-	"github.com/Studio7Dev/S7CliGo/pkg/commands"
-	misc "github.com/Studio7Dev/S7CliGo/pkg/misc"
+
+	"main/cmd"
+	"main/pkg/commands"
+	"main/pkg/misc"
 	"os"
 	"strings"
 )
 
 var (
 	f_  = misc.Funcs{}
-	MC_ = app_commands.MC{}
+	MC_ = cmd.MC{}
 )
 
 // import (
