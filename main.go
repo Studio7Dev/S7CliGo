@@ -3,9 +3,9 @@ package main
 import (
 	"fmt"
 
-	"main/cmd"
-	"main/pkg/commands"
-	"main/pkg/misc"
+	"CLI/cmd"
+	"CLI/pkg/commands"
+	"CLI/pkg/misc"
 	"os"
 	"strings"
 )

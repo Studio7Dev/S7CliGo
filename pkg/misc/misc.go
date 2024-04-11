@@ -1,13 +1,13 @@
 package misc
 
 import (
+	Auth "CLI/pkg/auth"
+	commandLib "CLI/pkg/commands"
+	MerlinAI "CLI/pkg/utils/merlin"
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
-	Auth "main/pkg/auth"
-	commandLib "main/pkg/commands"
-	MerlinAI "main/pkg/utils/merlin"
 	"net/http"
 	"os"
 	"os/exec"

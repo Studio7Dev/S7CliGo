@@ -1,15 +1,15 @@
 package cmd
 
 import (
+	commands2 "CLI/pkg/commands"
+	"CLI/pkg/misc"
+	BlackBox "CLI/pkg/utils/blackbox"
+	HugginFace "CLI/pkg/utils/huggingface"
+	Searx "CLI/pkg/utils/searx"
+	Movie_ "CLI/pkg/utils/tmdb"
 	"encoding/json"
 	"fmt"
 	"log"
-	commands2 "main/pkg/commands"
-	"main/pkg/misc"
-	BlackBox "main/pkg/utils/blackbox"
-	HugginFace "main/pkg/utils/huggingface"
-	Searx "main/pkg/utils/searx"
-	Movie_ "main/pkg/utils/tmdb"
 	"os"
 	"os/exec"
 	"runtime"
