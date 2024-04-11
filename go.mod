@@ -1,4 +1,4 @@
-module main
+module CLI
 
 replace pkg/commands v0.0.0 => ./pkg/commands
 
