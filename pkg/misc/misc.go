@@ -1,12 +1,12 @@
 package misc
 
 import (
-	Auth "CLI/Auth"
-	MerlinAI "CLI/merlin_cli"
-	"CLI/s7cli/commands"
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
+	Auth "github.com/Studio7Dev/S7CliGo/pkg/auth"
+	commandLib "github.com/Studio7Dev/S7CliGo/pkg/commands"
+	MerlinAI "github.com/Studio7Dev/S7CliGo/pkg/utils/merlin"
 	"io/ioutil"
 	"net/http"
 	"os"
@@ -61,7 +61,7 @@ func (f Funcs) LoadSettings() (Data, error) {
 }
 
 func (f Funcs) Banner() string {
-	banner := commands.Reset + `
+	banner := commandLib.Reset + `
     ███████╗███████╗     █████╗ ██╗     ██████╗██╗     ██╗
     ██╔════╝╚════██║    ██╔══██╗██║    ██╔════╝██║     ██║
     ███████╗    ██╔╝    ███████║██║    ██║     ██║     ██║
@@ -69,7 +69,7 @@ func (f Funcs) Banner() string {
     ███████║   ██║      ██║  ██║██║    ╚██████╗███████╗██║
     ╚══════╝   ╚═╝      ╚═╝  ╚═╝╚═╝     ╚═════╝╚══════╝╚═╝
     `
-	coloredBanner := strings.ReplaceAll(banner, "█", commands.BoldPurple+"█"+commands.Reset)
+	coloredBanner := strings.ReplaceAll(banner, "█", commandLib.BoldPurple+"█"+commandLib.Reset)
 	fmt.Println(coloredBanner)
 	return ""
 }
@@ -141,7 +141,7 @@ func (f Funcs) LoginRequest(username, password string) (int, error) {
 	}
 }
 
-func (f Funcs) MerlinAI_(args []string, this commands.Command) error {
+func (f Funcs) MerlinAI_(args []string, this commandLib.Command) error {
 	settingsFile, err := os.Open("settings.json")
 	if err != nil {
 		return fmt.Errorf("error opening JSON file: %v", err)

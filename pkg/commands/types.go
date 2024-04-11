@@ -1,8 +1,6 @@
 package commands
 
-import (
-	"github.com/c-bata/go-prompt"
-)
+import "github.com/c-bata/go-prompt"
 
 type Arg struct {
 	Name     Name

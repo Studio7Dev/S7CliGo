@@ -1,4 +1,4 @@
-package GPT_CLI
+package merlin
 
 import (
 	"bufio"

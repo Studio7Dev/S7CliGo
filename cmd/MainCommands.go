@@ -1,14 +1,14 @@
-package MCommands
+package cmd
 
 import (
-	HugginFace "CLI/HugAI"
-	misc "CLI/Misc"
-	Searx "CLI/SearXNG"
-	Movie_ "CLI/TMDB"
-	BlackBox "CLI/blackbox"
-	"CLI/s7cli/commands"
 	"encoding/json"
 	"fmt"
+	commands2 "github.com/Studio7Dev/S7CliGo/pkg/commands"
+	"github.com/Studio7Dev/S7CliGo/pkg/misc"
+	BlackBox "github.com/Studio7Dev/S7CliGo/pkg/utils/blackbox"
+	HugginFace "github.com/Studio7Dev/S7CliGo/pkg/utils/huggingface"
+	Searx "github.com/Studio7Dev/S7CliGo/pkg/utils/searx"
+	Movie_ "github.com/Studio7Dev/S7CliGo/pkg/utils/tmdb"
 	"log"
 	"os"
 	"os/exec"
@@ -33,7 +33,7 @@ var (
 	settings, err = f_.LoadSettings()
 )
 
-func (m *MC) Run(h commands.Handler) {
+func (m *MC) Run(h commands2.Handler) {
 	for {
 		h.SetPrompt("> ")
 		handler_input := h.GetInput()
@@ -42,17 +42,17 @@ func (m *MC) Run(h commands.Handler) {
 
 }
 func (m *MC) GetInput() string {
-	DefaultHandler := commands.DefaultHandler
+	DefaultHandler := commands2.DefaultHandler
 	DefaultHandler.SetPrompt("~# ")
 	return DefaultHandler.GetInput()
 
 }
-func (m *MC) Init(h commands.Handler) commands.Handler {
+func (m *MC) Init(h commands2.Handler) commands2.Handler {
 
-	type Command = commands.Command
-	type Arg = commands.Arg
+	type Command = commands2.Command
+	type Arg = commands2.Arg
 	// Clear command
-	h.AddCommand(commands.Command{
+	h.AddCommand(commands2.Command{
 		Name:        "clear",
 		Description: "Clears the console.",
 		Args:        []Arg{},
@@ -85,9 +85,9 @@ func (m *MC) Init(h commands.Handler) commands.Handler {
 		Args:        []Arg{},
 		Exec: func(input []string, this Command) error {
 			for {
-				DefaultHandlerx := commands.DefaultHandler
+				DefaultHandlerx := commands2.DefaultHandler
 				DefaultHandlerx.SetPrompt("Merlin > ")
-				DefaultHandlerx.AddCommand(commands.Command{
+				DefaultHandlerx.AddCommand(commands2.Command{
 					Name:        "exit",
 					Description: "Exit back to the main cli",
 				})
@@ -120,13 +120,13 @@ func (m *MC) Init(h commands.Handler) commands.Handler {
 			ChatId := "6608a05392dfb775db102588"
 			cookie := settings.HugginFaceCookie
 			for {
-				DefaultHandlerx2 := commands.DefaultHandler
+				DefaultHandlerx2 := commands2.DefaultHandler
 				DefaultHandlerx2.SetPrompt("Hugging Face > ")
-				DefaultHandlerx2.AddCommand(commands.Command{
+				DefaultHandlerx2.AddCommand(commands2.Command{
 					Name:        "exit",
 					Description: "Exit back to the main cli",
 				})
-				DefaultHandlerx2.AddCommand(commands.Command{
+				DefaultHandlerx2.AddCommand(commands2.Command{
 					Name:        "change model",
 					Description: "Change the current AI Model",
 				})
@@ -145,68 +145,68 @@ func (m *MC) Init(h commands.Handler) commands.Handler {
 				if message == "change model" {
 					fmt.Println("Available Models:")
 					fmt.Println("Use the TAB Button on your keyboard to cycle through the list of models")
-					Df := commands.DefaultHandler
+					Df := commands2.DefaultHandler
 					Df.SetPrompt("> ")
-					Df.AddCommand(commands.Command{
+					Df.AddCommand(commands2.Command{
 						Name:        "google/gemma-7b-it",
 						Description: "Google AI",
-						Exec: func(input []string, this commands.Command) error {
+						Exec: func(input []string, this commands2.Command) error {
 							model_ := this.Name
 							ChatId = client.ChangeModel(model_, cookie)
 							return nil
 						},
 					})
 
-					Df.AddCommand(commands.Command{
+					Df.AddCommand(commands2.Command{
 						Name:        "mistralai/Mixtral-8x7B-Instruct-v0.1",
 						Description: "Mixtral Chat AI v0.1",
-						Exec: func(input []string, this commands.Command) error {
+						Exec: func(input []string, this commands2.Command) error {
 							model_ := this.Name
 							ChatId = client.ChangeModel(model_, cookie)
 							return nil
 						},
 					})
 
-					Df.AddCommand(commands.Command{
+					Df.AddCommand(commands2.Command{
 						Name:        "mistralai/Mistral-7B-Instruct-v0.2",
 						Description: "Mixtral Chat AI v0.2",
-						Exec: func(input []string, this commands.Command) error {
+						Exec: func(input []string, this commands2.Command) error {
 							model_ := this.Name
 							ChatId = client.ChangeModel(model_, cookie)
 							return nil
 						},
 					})
-					Df.AddCommand(commands.Command{
+					Df.AddCommand(commands2.Command{
 						Name:        "meta-llama/Llama-2-70b-chat-hf",
 						Description: "Facebook (Meta) Llama AI",
-						Exec: func(input []string, this commands.Command) error {
+						Exec: func(input []string, this commands2.Command) error {
 							model_ := this.Name
 							ChatId = client.ChangeModel(model_, cookie)
 							return nil
 						},
 					})
-					Df.AddCommand(commands.Command{
+					Df.AddCommand(commands2.Command{
 						Name:        "NousResearch/Nous-Hermes-2-Mixtral-8x7B-DPO",
 						Description: "NousResearch x Mixtral-8x7B",
-						Exec: func(input []string, this commands.Command) error {
+						Exec: func(input []string, this commands2.Command) error {
 							model_ := this.Name
 							ChatId = client.ChangeModel(model_, cookie)
 							return nil
 						},
 					})
-					Df.AddCommand(commands.Command{
+					Df.AddCommand(commands2.Command{
 						Name:        "codellama/CodeLlama-70b-Instruct-hf",
 						Description: "CodeLlama (Programming Assistant AI)",
-						Exec: func(input []string, this commands.Command) error {
+						Exec: func(input []string, this commands2.Command) error {
 							model_ := this.Name
 							ChatId = client.ChangeModel(model_, cookie)
 							return nil
 						},
 					})
-					Df.AddCommand(commands.Command{
+					Df.AddCommand(commands2.Command{
 						Name:        "openchat/openchat-3.5-0106",
 						Description: "OpenChat 3.5 (GPT 3.5 Turbo)",
-						Exec: func(input []string, this commands.Command) error {
+						Exec: func(input []string, this commands2.Command) error {
 							model_ := this.Name
 							ChatId = client.ChangeModel(model_, cookie)
 							return nil
@@ -244,11 +244,11 @@ func (m *MC) Init(h commands.Handler) commands.Handler {
 		Name:        "blackbox",
 		Description: "BlackBox Programming AI Chat",
 		Args:        []Arg{},
-		Exec: func(input []string, this commands.Command) error {
+		Exec: func(input []string, this commands2.Command) error {
 			for {
-				DefaultHandlerx3 := commands.DefaultHandler
+				DefaultHandlerx3 := commands2.DefaultHandler
 				DefaultHandlerx3.SetPrompt("BlackBox > ")
-				DefaultHandlerx3.AddCommand(commands.Command{
+				DefaultHandlerx3.AddCommand(commands2.Command{
 					Name:        "exit",
 					Description: "Exit back to the main cli",
 				})
@@ -274,15 +274,15 @@ func (m *MC) Init(h commands.Handler) commands.Handler {
 		Name:        "searx",
 		Description: "Use Searx Search Engine",
 		Args:        []Arg{},
-		Exec: func(input []string, this commands.Command) error {
+		Exec: func(input []string, this commands2.Command) error {
 			for {
-				DefaultHandlerx4 := commands.DefaultHandler
+				DefaultHandlerx4 := commands2.DefaultHandler
 				DefaultHandlerx4.SetPrompt("Searx > ")
-				DefaultHandlerx4.AddCommand(commands.Command{
+				DefaultHandlerx4.AddCommand(commands2.Command{
 					Name:        "exit",
 					Description: "Exit back to the main cli",
 				})
-				DefaultHandlerx4.AddCommand(commands.Command{
+				DefaultHandlerx4.AddCommand(commands2.Command{
 					Name:        "search",
 					Description: "Search for something on Searx",
 				})
@@ -301,7 +301,7 @@ func (m *MC) Init(h commands.Handler) commands.Handler {
 				if message == "search" {
 					Searx_ := Searx.NewSearchEngine()
 					DefaultHandlerx4.SetPrompt("Searx Search > ")
-					DefaultHandlerx4.AddCommand(commands.Command{
+					DefaultHandlerx4.AddCommand(commands2.Command{
 						Name:        "exit",
 						Description: "Exit back to the main cli",
 					})
@@ -325,11 +325,11 @@ func (m *MC) Init(h commands.Handler) commands.Handler {
 								results[i].Title = results[i].Title[0:100]
 							}
 							x = x + 1
-							DefaultHandlerx4.AddCommand(commands.Command{
+							DefaultHandlerx4.AddCommand(commands2.Command{
 								Name:        `>` + strconv.Itoa(x),
 								Description: results[i].Title,
 								Args:        []Arg{},
-								Exec: func(input []string, this commands.Command) error {
+								Exec: func(input []string, this commands2.Command) error {
 									DefaultHandlerx4.Handle("clear")
 									fmt.Println("==============================================================")
 									fmt.Println(results[i].Href)
@@ -365,15 +365,15 @@ func (m *MC) Init(h commands.Handler) commands.Handler {
 		Name:        "movie",
 		Description: "Search for a movie",
 		Args:        []Arg{},
-		Exec: func(input []string, this commands.Command) error {
+		Exec: func(input []string, this commands2.Command) error {
 			for {
-				DefaultHandlerx5 := commands.DefaultHandler
+				DefaultHandlerx5 := commands2.DefaultHandler
 				DefaultHandlerx5.SetPrompt("Movie > ")
-				DefaultHandlerx5.AddCommand(commands.Command{
+				DefaultHandlerx5.AddCommand(commands2.Command{
 					Name:        "exit",
 					Description: "Exit back to the main cli",
 				})
-				DefaultHandlerx5.AddCommand(commands.Command{
+				DefaultHandlerx5.AddCommand(commands2.Command{
 					Name:        "search",
 					Description: "Search for a movie",
 				})
@@ -404,10 +404,10 @@ func (m *MC) Init(h commands.Handler) commands.Handler {
 					fmt.Println("Press to view the results")
 					for i := range resp.Results {
 
-						DefaultHandlerx5.AddCommand(commands.Command{
+						DefaultHandlerx5.AddCommand(commands2.Command{
 							Name:        ">" + strconv.Itoa(i),
 							Description: resp.Results[i].Title,
-							Exec: func(input []string, this commands.Command) error {
+							Exec: func(input []string, this commands2.Command) error {
 								h.Handle("clear")
 
 								title_ := resp.Results[i].Title
@@ -453,9 +453,9 @@ func (m *MC) Init(h commands.Handler) commands.Handler {
 								if yN {
 									f_.OpenUrl(source_url)
 								}
-								internal_handler := commands.DefaultHandler
+								internal_handler := commands2.DefaultHandler
 								internal_handler.SetPrompt("Back? > ")
-								internal_handler.AddCommand(commands.Command{
+								internal_handler.AddCommand(commands2.Command{
 									Name:        "exit",
 									Description: "Exit back to the main cli",
 								})
@@ -492,7 +492,7 @@ func (m *MC) Init(h commands.Handler) commands.Handler {
 		Name:        "settings",
 		Description: "Configure application settings",
 		Args:        []Arg{},
-		Exec: func(input []string, this commands.Command) error {
+		Exec: func(input []string, this commands2.Command) error {
 			f_.SettingsPage()
 			f_.Banner()
 			return nil

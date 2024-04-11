@@ -1,17 +1,17 @@
 package main
 
 import (
-	"CLI/MCommands"
-	misc "CLI/Misc"
-	"CLI/s7cli/commands"
 	"fmt"
+	app_commands "github.com/Studio7Dev/S7CliGo/cmd"
+	"github.com/Studio7Dev/S7CliGo/pkg/commands"
+	misc "github.com/Studio7Dev/S7CliGo/pkg/misc"
 	"os"
 	"strings"
 )
 
 var (
 	f_  = misc.Funcs{}
-	MC_ = MCommands.MC{}
+	MC_ = app_commands.MC{}
 )
 
 // import (
@@ -22,7 +22,7 @@ var (
 //	Movie_ "CLI/TMDB"
 //	blackbox "CLI/blackbox"
 //	MerlinAI "CLI/merlin_cli"
-//	"CLI/s7cli/commands"
+//	"CLI/s7cli/app_commands"
 //
 // )
 

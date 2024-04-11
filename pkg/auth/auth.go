@@ -1,4 +1,4 @@
-package CLI
+package auth
 
 import (
 	"bytes"

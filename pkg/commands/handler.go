@@ -2,9 +2,8 @@ package commands
 
 import (
 	"fmt"
-	"strings"
-
 	"github.com/c-bata/go-prompt"
+	"strings"
 )
 
 func NewHandler(prompt string, commands ...Command) Handler {
