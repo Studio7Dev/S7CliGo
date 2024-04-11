@@ -15,18 +15,6 @@ var (
 	MC_ = cmd.MC{}
 )
 
-// import (
-//
-//	Auth "CLI/Auth"
-//	HugginFace "CLI/HugAI"
-//	Searx "CLI/SearXNG"
-//	Movie_ "CLI/TMDB"
-//	blackbox "CLI/blackbox"
-//	MerlinAI "CLI/merlin_cli"
-//	"CLI/s7cli/app_commands"
-//
-// )
-
 func main() {
 
 	settings, err := f_.LoadSettings()
