@@ -13,6 +13,8 @@ Features
 * BlackBox Programming AI Chat integration
 * Searx Search Engine integration
 * TMDB (The Movie Database) integration
+* Bing AI integration
+* AI text to image
 
 Getting Started
 ---------------
