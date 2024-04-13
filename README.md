@@ -1,3 +1,4 @@
+
 # S7 Beta CLI (Command Line Interface) [Developer Version]
 
 
@@ -31,6 +32,7 @@ Commands
 | `blackbox` | Interact with BlackBox Programming AI Chat |
 | `searx` | Use Searx Search Engine |
 | `movie` | Search for a movie with TMDB |
+|`bingai`| Interact with the Bing AI from `bing.com/chat`
 
 #### Available Models
 
