@@ -33,6 +33,7 @@ Commands
 | `searx` | Use Searx Search Engine |
 | `movie` | Search for a movie with TMDB |
 |`bingai`| Interact with the Bing AI from `bing.com/chat`
+| `img-gen`| Generate images from text prompts, using AI |
 
 #### Available Models for HuggingFace
 
