@@ -34,7 +34,7 @@ Commands
 | `movie` | Search for a movie with TMDB |
 |`bingai`| Interact with the Bing AI from `bing.com/chat`
 
-#### Available Models
+#### Available Models for HuggingFace
 
 | Model Name | Description |
 | --- | --- |
