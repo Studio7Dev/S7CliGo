@@ -130,7 +130,7 @@ type FileCookie struct {
 }
 
 func ReadCookiesFileRaw() ([]FileCookie, error) {
-	v, err := os.ReadFile(WithPath("cookies.json"))
+	v, err := os.ReadFile(WithPath("data/bingcookies.json"))
 	if err != nil {
 		return nil, nil
 	}
@@ -164,7 +164,7 @@ func UpdateCookiesFile(cookies map[string]string) error {
 	if err != nil {
 		return err
 	}
-	err = os.WriteFile(WithPath("cookies.json"), v, 0644)
+	err = os.WriteFile(WithPath("data/bingcookies.json"), v, 0644)
 	if err != nil {
 		return err
 	}
