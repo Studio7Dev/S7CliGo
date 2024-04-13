@@ -417,7 +417,7 @@ func NewWebAPI() *WebAPI {
 		json.NewEncoder(w).Encode(ToOpenAIImageGeneration(image))
 	})
 
-	// serve the router
+	// serve the router x
 	log.Println("Listening on :" + port)
 	log.Fatal(http.ListenAndServe(":"+port, r))
 	return nil
