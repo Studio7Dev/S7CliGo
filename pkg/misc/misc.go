@@ -7,6 +7,7 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"net/http"
 	"os"
@@ -36,6 +37,30 @@ type Data struct {
 	BlackBoxCookie   string `json:"blackbox_cookie"`
 	Username         string `json:"username"`
 	Password         string `json:"password"`
+}
+
+func (f Funcs) DownloadImage(url, filepath string) error {
+	// Get the data from the URL
+	resp, err := http.Get(url)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+
+	// Create the file where we will store the image
+	file, err := os.Create(filepath)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+
+	// Copy the data from the response body to the file
+	_, err = io.Copy(file, resp.Body)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (f Funcs) LoadSettings() (Data, error) {

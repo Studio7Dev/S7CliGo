@@ -3,7 +3,6 @@ package sydney
 import (
 	"CLI/pkg/utils/util"
 	"errors"
-	"log/slog"
 	"net/url"
 	"regexp"
 	"strings"
@@ -31,7 +30,7 @@ func (o *Sydney) GenerateImage(generativeImage GenerativeImage) (GenerateImageRe
 	re := regexp.MustCompile(`<img class="mimg".*?src="(.*?)"`)
 	u := "https://www.bing.com/images/create/async/results/" + resultID +
 		"?q=" + url.QueryEscape(generativeImage.Text) + "&partner=sydney&showselective=1&IID=images.as"
-	slog.Info("Result URL", "v", u)
+	//slog.Info("Result URL", "v", u)
 	for i := 0; i < 15; i++ {
 		time.Sleep(3 * time.Second)
 		resp, err := client.R().Get(u)
@@ -45,13 +44,13 @@ func (o *Sydney) GenerateImage(generativeImage GenerativeImage) (GenerateImageRe
 		var imageURLs []string
 		arr := re.FindAllStringSubmatch(bodyStr, -1)
 		if len(arr) == 0 {
-			slog.Info("No matched images currently", "body", bodyStr)
+			//slog.Info("No matched images currently", "body", bodyStr)
 			continue
 		}
 		for _, match := range arr {
 			imageURLs = append(imageURLs, match[1])
 		}
-		slog.Info("Created images successfully", "images", imageURLs)
+		//slog.Info("Created images successfully", "images", imageURLs)
 		return GenerateImageResult{
 			GenerativeImage: generativeImage,
 			ImageURLs:       imageURLs,

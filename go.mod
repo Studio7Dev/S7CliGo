@@ -9,6 +9,7 @@ require (
 	github.com/c-bata/go-prompt v0.2.6
 	github.com/charmbracelet/huh v0.3.0
 	github.com/dlclark/regexp2 v1.11.0
+	github.com/go-chi/chi/v5 v5.0.12
 	github.com/go-rod/rod v0.114.8
 	github.com/go-rod/stealth v0.4.9
 	github.com/google/uuid v1.6.0
