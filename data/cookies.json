@@ -1,0 +1,46 @@
+[
+  {
+    "name": "SRCHUID",
+    "value": "V=2\u0026GUID=063702FDEC2C4C4486F42E5851603DA3\u0026dmnchg=1"
+  },
+  {
+    "name": "SRCHHPGUSR",
+    "value": "SRCHLANG=en"
+  },
+  {
+    "name": "_EDGE_V",
+    "value": "1"
+  },
+  {
+    "name": "_C_ETH",
+    "value": "1"
+  },
+  {
+    "name": "MUID",
+    "value": "0268544B3B066E6E1C06402B3A4B6F1B"
+  },
+  {
+    "name": "_SS",
+    "value": "SID=29C6D7FF2F566A633010C39F2E1B6BAA"
+  },
+  {
+    "name": "SRCHD",
+    "value": "AF=NOFORM"
+  },
+  {
+    "name": "_C_Auth",
+    "value": ""
+  },
+  {
+    "name": "SRCHUSR",
+    "value": "DOB=20240413"
+  },
+  {
+    "name": "MUIDB",
+    "value": "0268544B3B066E6E1C06402B3A4B6F1B"
+  },
+  {
+    "name": "_EDGE_S",
+    "value": "F=1"
+  }
+]

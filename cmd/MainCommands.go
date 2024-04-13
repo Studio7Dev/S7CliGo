@@ -6,7 +6,11 @@ import (
 	BlackBox "CLI/pkg/utils/blackbox"
 	HugginFace "CLI/pkg/utils/huggingface"
 	Searx "CLI/pkg/utils/searx"
+	"CLI/pkg/utils/sydney"
 	Movie_ "CLI/pkg/utils/tmdb"
+	"CLI/pkg/utils/util"
+	"bufio"
+	"context"
 	"encoding/json"
 	"fmt"
 	"log"
@@ -489,12 +493,63 @@ func (m *MC) Init(h commands2.Handler) commands2.Handler {
 		},
 	})
 	h.AddCommand(Command{
+		Name:        "bingai",
+		Description: "bing.com/chat in the terminal",
+		Args:        []Arg{},
+		Exec: func(input []string, this commands2.Command) error {
+			cookies, err := util.ReadCookiesFile()
+			if err != nil {
+				log.Fatalf("Error reading cookies file: %v", err)
+			}
+			sydney_ := sydney.NewSydney(sydney.Options{
+				Debug:                 false,
+				Cookies:               cookies,
+				Proxy:                 "",
+				ConversationStyle:     "",
+				Locale:                "en-US",
+				WssDomain:             "",
+				CreateConversationURL: "",
+				NoSearch:              false,
+			})
+			for {
+				reader := bufio.NewReader(os.Stdin)
+				fmt.Print("Enter Message: ")
+				text, _ := reader.ReadString('\n')
+
+				ch, err := sydney_.AskStream(sydney.AskStreamOptions{
+					StopCtx:        context.TODO(),
+					Prompt:         text,
+					WebpageContext: "",
+					ImageURL:       "",
+				})
+				if err != nil {
+					log.Fatalf("Error creating Sydney instance: %v", err)
+				}
+				for msg := range ch {
+					fmt.Print(msg.Text)
+					if msg.Error != nil {
+						log.Printf("Error: %v", msg.Error)
+					}
+				}
+			}
+		},
+	})
+	h.AddCommand(Command{
 		Name:        "settings",
 		Description: "Configure application settings",
 		Args:        []Arg{},
 		Exec: func(input []string, this commands2.Command) error {
 			f_.SettingsPage()
 			f_.Banner()
+			return nil
+		},
+	})
+	h.AddCommand(Command{
+		Name:        "exit",
+		Description: "Exits this application or goes back.",
+		Args:        []Arg{},
+		Exec: func(args []string, command Command) error {
+			os.Exit(0)
 			return nil
 		},
 	})
