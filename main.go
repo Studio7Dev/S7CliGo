@@ -16,6 +16,7 @@ var (
 
 func main() {
 	// gui.GuiAPP()
+	// httpserver.NewHttpServer()
 	// os.Exit(0)
 	settings, err := f_.LoadSettings()
 	if err != nil {
