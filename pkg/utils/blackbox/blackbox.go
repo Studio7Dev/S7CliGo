@@ -36,7 +36,7 @@ func (bb *BlackboxClient) GenerateUserID() string {
 	return fmt.Sprintf("%s-%s-%s-%s-%s", bb.GenerateID(8), bb.GenerateID(4), bb.GenerateID(4), bb.GenerateID(4), bb.GenerateID(12))
 }
 
-func (bb *BlackboxClient) SendMessage(content string) {
+func (bb *BlackboxClient) SendMessage(content string, raw bool) http.Response {
 	userID := bb.GenerateUserID()
 	messageID := bb.GenerateID(7)
 	data := strings.NewReader(fmt.Sprintf(`{"messages":[{"id":"%s","role":"user","content":"%s"}],"id":"%s","previewToken":null,"userId":"%s","codeModelMode":true,"agentMode":{},"trendingAgentMode":{},"isMicMode":false,"isChromeExt":false,"githubToken":null}`, messageID, content, messageID, userID))
@@ -60,13 +60,19 @@ func (bb *BlackboxClient) SendMessage(content string) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	defer resp.Body.Close()
-	reader := bufio.NewReader(resp.Body)
-	for {
-		line, err := reader.ReadString('\n')
-		if err != nil {
-			return
+
+	if !raw {
+		for {
+			reader := bufio.NewReader(resp.Body)
+			line, err := reader.ReadString('\n')
+			if err != nil {
+				return http.Response{}
+			}
+			fmt.Print(line)
 		}
-		fmt.Print(line)
 	}
+	if raw {
+		return *resp
+	}
+	return *resp
 }

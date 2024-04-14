@@ -109,11 +109,11 @@ func (s *ChatClient) ChangeModel(model string, cookie string) string {
 	return string(fmt.Sprint(convId))
 }
 
-func (c *ChatClient) SendMessage(message string, convId string, Id string, cookie string) error {
+func (c *ChatClient) SendMessage(message string, convId string, Id string, cookie string, raw bool) (error, http.Response) {
 	data := strings.NewReader(fmt.Sprintf(`{"inputs":"%s","id":"%s","is_retry":false,"is_continue":false,"web_search":false,"files":[]}`, message, Id))
 	req, err := http.NewRequest("POST", "https://huggingface.co/chat/conversation/"+convId, data)
 	if err != nil {
-		return err
+		return err, http.Response{}
 	}
 	req.Header.Set("accept", "*/*")
 	req.Header.Set("accept-language", "en-GB,en-US;q=0.9,en;q=0.8")
@@ -131,37 +131,52 @@ func (c *ChatClient) SendMessage(message string, convId string, Id string, cooki
 
 	resp, err := c.Client.Do(req)
 	if err != nil {
-		return err
+		return err, http.Response{
+			StatusCode: resp.StatusCode,
+			Header:     resp.Header,
+		}
 	}
-	defer resp.Body.Close()
+	// defer resp.Body.Close()
 
 	contentType := resp.Header.Get("Content-Type")
 	if contentType != "text/event-stream" {
-		return fmt.Errorf("expected content type text/event-stream, got %s", contentType)
+		return fmt.Errorf("unexpected content type: %s", contentType), *resp
 	}
 
-	reader := bufio.NewReader(resp.Body)
-	for {
-		line, err := reader.ReadString('\n')
-		if err != nil {
-			if err == io.EOF {
-				break
+	if !raw {
+		reader := bufio.NewReader(resp.Body)
+		for {
+			line, err := reader.ReadString('\n')
+			if err != nil {
+				if err == io.EOF {
+					break
+				}
+				return err, http.Response{
+					StatusCode: resp.StatusCode,
+					Header:     resp.Header,
+				}
 			}
-			return err
+			line = strings.TrimSpace(line)
+			if line == "" {
+				continue
+			}
+			var event map[string]interface{}
+			if err := json.Unmarshal([]byte(line), &event); err != nil {
+				return err, http.Response{
+					StatusCode: resp.StatusCode,
+					Header:     resp.Header,
+				}
+			}
+			if event["type"] == "stream" {
+				fmt.Print(event["token"])
+			}
 		}
-		line = strings.TrimSpace(line)
-		if line == "" {
-			continue
-		}
-		var event map[string]interface{}
-		if err := json.Unmarshal([]byte(line), &event); err != nil {
-			return err
-		}
-		if event["type"] == "stream" {
-			fmt.Print(event["token"])
-		}
+
+		fmt.Print("\r\n")
+	}
+	if raw {
+		return nil, *resp
 	}
 
-	fmt.Print("\r\n")
-	return nil
+	return nil, *resp
 }

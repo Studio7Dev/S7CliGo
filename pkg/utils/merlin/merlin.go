@@ -70,6 +70,11 @@ func (m *Merlin) Chat(message string) (io.Reader, error) {
 	return resp.Body, nil
 }
 
+func (m *Merlin) RawStream(message string) (http.Response, error) {
+
+	return http.Response{}, nil
+}
+
 func (m *Merlin) StreamContent(responseBody io.Reader) error {
 	scanner := bufio.NewScanner(responseBody)
 	for scanner.Scan() {
