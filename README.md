@@ -35,8 +35,9 @@ Commands
 | `searx` | Use Searx Search Engine |
 | `movie` | Search for a movie with TMDB |
 | `bingai`| Interact with the Bing AI from `bing.com/chat`
-| `img-gen`| Generate images from text prompts, using AI |
-
+| `img-gen` | Generate images from text prompts, using AI |
+| `enable-tcp` | Enable TCP API Usage |
+| `enable-http`| Enable Web API Usage |
 #### Available Models for HuggingFace
 
 | Model Name | Description |
