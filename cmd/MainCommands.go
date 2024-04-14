@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"CLI/gui"
 	cmds_ "CLI/pkg/commands"
 	"CLI/pkg/misc"
 	BlackBox "CLI/pkg/utils/blackbox"
@@ -9,9 +10,11 @@ import (
 	"CLI/pkg/utils/sydney"
 	Movie_ "CLI/pkg/utils/tmdb"
 	"CLI/pkg/utils/util"
+	"bufio"
 	"context"
 	"encoding/json"
 	"fmt"
+	"io"
 	"log"
 	"os"
 	"os/exec"
@@ -237,10 +240,33 @@ func (m *MC) Init(h cmds_.Handler) cmds_.Handler {
 				}
 
 				Id_ := client.GetMsgUID(ChatId, cookie)
-				err := client.SendMessage(message, ChatId, Id_, cookie)
-				if err != nil {
+				err, r := client.SendMessage(message, ChatId, Id_, cookie, true)
+				if err != nil && r.Body == nil {
 					log.Fatal(err)
 				}
+				reader := bufio.NewReader(r.Body)
+				for {
+					line, err := reader.ReadString('\n')
+					if err != nil {
+						if err == io.EOF {
+							break
+						}
+						return nil
+					}
+					line = strings.TrimSpace(line)
+					if line == "" {
+						continue
+					}
+					var event map[string]interface{}
+					if err := json.Unmarshal([]byte(line), &event); err != nil {
+						return nil
+					}
+					if event["type"] == "stream" {
+						fmt.Print(event["token"])
+					}
+				}
+				fmt.Print("\r\n")
+
 			}
 			return nil
 		},
@@ -270,7 +296,15 @@ func (m *MC) Init(h cmds_.Handler) cmds_.Handler {
 				}
 
 				BlackBox_ := BlackBox.NewBlackboxClient()
-				BlackBox_.SendMessage(message)
+				reply := BlackBox_.SendMessage(message, true)
+				for {
+					reader := bufio.NewReader(reply.Body)
+					line, err := reader.ReadString('\n')
+					if err != nil {
+						return err
+					}
+					fmt.Print(line)
+				}
 			}
 			return nil
 		},
@@ -655,6 +689,15 @@ func (m *MC) Init(h cmds_.Handler) cmds_.Handler {
 
 				}
 			}
+			return nil
+		},
+	})
+	h.AddCommand(Command{
+		Name:        "gui",
+		Description: "Launch a graphical user interface for the application",
+		Args:        []Arg{},
+		Exec: func(input []string, this cmds_.Command) error {
+			gui.GuiAPP()
 			return nil
 		},
 	})
