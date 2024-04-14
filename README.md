@@ -101,19 +101,41 @@ cd SshServer
 #### Hugging Face
 #### Go to https://huggingface.co/chat, login and then get the cookie, im too lazy to explain just figure it out using the last step lmao
 
-### Merlin WebAPI
+--------
+## WebAPI Implementations
+--------
+### Merlin
 ```curl
 curl -N -X POST -H "Content-Type: application/json" --data '{"message":"hi"}' http://localhost:8080/merlin
 ```
-### HuggingFace WebAPI
+### HuggingFace
 ```curl
 curl -N -X POST -H "Content-Type: application/json" --data '{"message":"hi how are you", "model":"mistralai/Mistral-7B-Instruct-v0.2"}' http://localhost:8080/hug
 ```
-### BingAI WebAPI
+### BingAI
 ```curl
 curl -N -X POST -H "Content-Type: application/json" --data '{"message":"hi how are you"}' http://localhost:8080/bing
 ```
-### BlackBox WebAPI
+### BlackBox
 ```curl
 curl -N -X POST -H "Content-Type: application/json" --data '{"message":"def hello()"}' http://localhost:8080/blackbox
+```
+--------
+## TCP Implementations
+--------
+### Merlin
+```
+ai merlin hi how are you? can you code?
+```
+### HuggingFace
+```
+ai hug hi how are you? can you code?
+```
+### BingAI
+```
+ai bing hi how are you? can you code?
+```
+### BlackBox
+```
+ai blackbox hi how are you? can you code?
 ```
