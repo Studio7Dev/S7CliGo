@@ -101,7 +101,7 @@ cd SshServer
 #### Hugging Face
 #### Go to https://huggingface.co/chat, login and then get the cookie, im too lazy to explain just figure it out using the last step lmao
 
---------
+---
 ## WebAPI Implementations
 ---
 ### Merlin
@@ -120,7 +120,7 @@ curl -N -X POST -H "Content-Type: application/json" --data '{"message":"hi how a
 ```curl
 curl -N -X POST -H "Content-Type: application/json" --data '{"message":"def hello()"}' http://localhost:8080/blackbox
 ```
---------
+---
 ## TCP Implementations
 ---
 ### Merlin
