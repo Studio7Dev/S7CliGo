@@ -198,6 +198,8 @@ func handleConnection(conn net.Conn) {
 	}
 }
 
+var kill bool = false
+
 func NewServer() {
 	listen, err := net.Listen("tcp4", ":1337")
 	if err != nil {
@@ -208,6 +210,9 @@ func NewServer() {
 	fmt.Println("Listening on :1337...")
 
 	for {
+		if kill {
+			break
+		}
 		conn, err := listen.Accept()
 		if err != nil {
 			fmt.Println("Error accepting connection:", err)

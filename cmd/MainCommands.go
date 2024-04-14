@@ -714,6 +714,15 @@ func (m *MC) Init(h cmds_.Handler) cmds_.Handler {
 		},
 	})
 	h.AddCommand(Command{
+		Name:        "disable-tcp",
+		Description: "Disable TCP mode for the application",
+		Args:        []Arg{},
+		Exec: func(input []string, this cmds_.Command) error {
+			fmt.Println("TCP mode disable not implemented yet.")
+			return nil
+		},
+	})
+	h.AddCommand(Command{
 		Name:        "settings",
 		Description: "Configure application settings",
 		Args:        []Arg{},
