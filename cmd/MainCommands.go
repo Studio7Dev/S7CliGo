@@ -4,6 +4,7 @@ import (
 	"CLI/gui"
 	cmds_ "CLI/pkg/commands"
 	"CLI/pkg/misc"
+	tcpserver "CLI/pkg/tcp"
 	BlackBox "CLI/pkg/utils/blackbox"
 	HugginFace "CLI/pkg/utils/huggingface"
 	Searx "CLI/pkg/utils/searx"
@@ -698,6 +699,17 @@ func (m *MC) Init(h cmds_.Handler) cmds_.Handler {
 		Args:        []Arg{},
 		Exec: func(input []string, this cmds_.Command) error {
 			gui.GuiAPP()
+			return nil
+		},
+	})
+	h.AddCommand(Command{
+		Name:        "enable-tcp",
+		Description: "Enable TCP mode for the application",
+		Args:        []Arg{},
+		Exec: func(input []string, this cmds_.Command) error {
+			go func() {
+				tcpserver.NewServer()
+			}()
 			return nil
 		},
 	})

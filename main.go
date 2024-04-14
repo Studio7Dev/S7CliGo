@@ -4,7 +4,6 @@ import (
 	"CLI/cmd"
 	"CLI/pkg/commands"
 	"CLI/pkg/misc"
-	tcpserver "CLI/pkg/tcp"
 	"fmt"
 	"os"
 	"strings"
@@ -16,7 +15,6 @@ var (
 )
 
 func main() {
-	tcpserver.NewServer()
 	// gui.GuiAPP()
 	// os.Exit(0)
 	settings, err := f_.LoadSettings()
