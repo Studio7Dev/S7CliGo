@@ -37,6 +37,8 @@ type Data struct {
 	BlackBoxCookie   string `json:"blackbox_cookie"`
 	Username         string `json:"username"`
 	Password         string `json:"password"`
+	TcpHost          string `json:"tcphost"`
+	Httphost         string `json:"httphost"`
 }
 
 func (f Funcs) DownloadImage(url, filepath string) error {
@@ -229,6 +231,7 @@ func (f Funcs) OpenUrl(url string) {
 		fmt.Printf("Error occurred starting the command '%s'. Error:\n%s", strings.Join(cmdArgs, " "), err.Error())
 		fmt.Println("\nOutput:", string(output[:]))
 	} else {
+		return
 		// fmt.Printf("Successfully started command '%s'\n", strings.Join(cmdArgs, " "))
 	}
 }

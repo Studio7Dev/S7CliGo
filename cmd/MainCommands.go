@@ -11,6 +11,7 @@ import (
 	"CLI/pkg/utils/sydney"
 	Movie_ "CLI/pkg/utils/tmdb"
 	"CLI/pkg/utils/util"
+	httpserver "CLI/pkg/web"
 	"bufio"
 	"context"
 	"encoding/json"
@@ -719,6 +720,17 @@ func (m *MC) Init(h cmds_.Handler) cmds_.Handler {
 		Args:        []Arg{},
 		Exec: func(input []string, this cmds_.Command) error {
 			fmt.Println("TCP mode disable not implemented yet.")
+			return nil
+		},
+	})
+	h.AddCommand(Command{
+		Name:        "enable-http",
+		Description: "Enable HTTP mode for the application",
+		Args:        []Arg{},
+		Exec: func(input []string, this cmds_.Command) error {
+			go func() {
+				httpserver.NewHttpServer()
+			}()
 			return nil
 		},
 	})

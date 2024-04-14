@@ -14,7 +14,10 @@ import (
 	"io"
 	"log"
 	"net"
+	"os"
+	"os/signal"
 	"strings"
+	"sync"
 
 	"github.com/labstack/gommon/random"
 )
@@ -198,27 +201,50 @@ func handleConnection(conn net.Conn) {
 	}
 }
 
-var kill bool = false
+var (
+	stop = make(chan struct{})
+)
 
 func NewServer() {
-	listen, err := net.Listen("tcp4", ":1337")
+	listen, err := net.Listen("tcp4", settings.TcpHost)
 	if err != nil {
 		panic(err)
 	}
 	defer listen.Close()
 
-	fmt.Println("Listening on :1337...")
+	fmt.Println("Listening on " + settings.TcpHost)
 
-	for {
-		if kill {
-			break
-		}
-		conn, err := listen.Accept()
-		if err != nil {
-			fmt.Println("Error accepting connection:", err)
-			continue
-		}
+	sigChan := make(chan os.Signal, 1)
+	signal.Notify(sigChan, os.Interrupt)
+	go func() {
+		sig := <-sigChan
+		fmt.Printf("Caught signal %s: terminating\n", sig)
+		close(stop)
+	}()
 
-		go handleConnection(conn)
-	}
+	// Accept incoming connections
+	var wg sync.WaitGroup
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		for {
+			select {
+			case <-stop:
+				close(stop)
+				return
+			default:
+				conn, err := listen.Accept()
+				if err != nil {
+					fmt.Println("Error accepting connection:", err.Error())
+					continue
+				}
+
+				// Handle each connection in a new goroutine
+				go handleConnection(conn)
+			}
+		}
+	}()
+
+	// Wait for the server to finish
+	wg.Wait()
 }
