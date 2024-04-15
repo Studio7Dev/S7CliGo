@@ -42,6 +42,9 @@ var (
 )
 
 func (c YouAIClient) NewUuid() string {
+	if err != nil {
+		log.Fatal(err)
+	}
 	uuid_base, err := uuid.NewUUID()
 	if err != nil {
 		log.Fatal(err)
@@ -166,7 +169,5 @@ func (c YouAIClient) SendMessage(message string, raw bool) (error, http.Response
 		fmt.Print("\r\n")
 		return nil, *resp
 	}
-	return nil, http.Response{
-		StatusCode: 403,
-	}
+
 }

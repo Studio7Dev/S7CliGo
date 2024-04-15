@@ -1,7 +1,6 @@
 package cmd
 
 import (
-	"CLI/gui"
 	cmds_ "CLI/pkg/commands"
 	"CLI/pkg/misc"
 	tcpserver "CLI/pkg/tcp"
@@ -732,15 +731,15 @@ func (m *MC) Init(h cmds_.Handler) cmds_.Handler {
 			return nil
 		},
 	})
-	h.AddCommand(Command{
-		Name:        "gui",
-		Description: "Launch a graphical user interface for the application",
-		Args:        []Arg{},
-		Exec: func(input []string, this cmds_.Command) error {
-			gui.GuiAPP()
-			return nil
-		},
-	})
+	// h.AddCommand(Command{
+	// 	Name:        "gui",
+	// 	Description: "Launch a graphical user interface for the application",
+	// 	Args:        []Arg{},
+	// 	Exec: func(input []string, this cmds_.Command) error {
+	// 		gui.GuiAPP()
+	// 		return nil
+	// 	},
+	// })
 	h.AddCommand(Command{
 		Name:        "enable-tcp",
 		Description: "Enable TCP mode for the application",
