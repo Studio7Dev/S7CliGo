@@ -107,23 +107,39 @@ cd SshServer
 ## WebAPI Implementations
 ---
 ### Merlin
+#### Linux
 ```curl
 curl -N -X POST -H "Content-Type: application/json" --data '{"message":"hi"}' http://localhost:8080/merlin
+```
+#### Windows
+```curl
 curl -N -X POST -H "Content-Type: application/json" --data "{\"message\":\"hi\"}" http://localhost:8080/merlin
 ```
 ### HuggingFace
+#### Linux
 ```curl
 curl -N -X POST -H "Content-Type: application/json" --data '{"message":"hi how are you", "model":"mistralai/Mistral-7B-Instruct-v0.2"}' http://localhost:8080/hug
+```
+#### Windows
+```curl
 curl -N -X POST -H "Content-Type: application/json" --data "{\"message\":\"hi how are you\", \"model\":\"mistralai/Mistral-7B-Instruct-v0.2\"}" http://localhost:8080/hug
 ```
 ### BingAI
+#### Linux
 ```curl
 curl -N -X POST -H "Content-Type: application/json" --data '{"message":"hi how are you"}' http://localhost:8080/bing
+```
+#### Windows
+```curl
 curl -N -X POST -H "Content-Type: application/json" --data "{\"message\":\"hi how are you\"}" http://localhost:8080/bing
 ```
 ### BlackBox
+#### Linux
 ```curl
 curl -N -X POST -H "Content-Type: application/json" --data '{"message":"def hello()"}' http://localhost:8080/blackbox
+```
+#### Windows
+```curl
 curl -N -X POST -H "Content-Type: application/json" --data "{\"message\":\"def hello()\"}" http://localhost:8080/blackbox
 ```
 ---
