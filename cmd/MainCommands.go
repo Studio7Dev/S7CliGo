@@ -11,6 +11,7 @@ import (
 	"CLI/pkg/utils/sydney"
 	Movie_ "CLI/pkg/utils/tmdb"
 	"CLI/pkg/utils/util"
+	"CLI/pkg/utils/youai"
 	httpserver "CLI/pkg/web"
 	"bufio"
 	"context"
@@ -689,6 +690,45 @@ func (m *MC) Init(h cmds_.Handler) cmds_.Handler {
 
 				}
 			}
+			return nil
+		},
+	})
+	h.AddCommand(Command{
+		Name:        "youai",
+		Description: "Interact with YouAI from you.com",
+		Args:        []Arg{},
+		Exec: func(input []string, this cmds_.Command) error {
+
+			YouAI := youai.YouAIClient{}
+			youhandler := cmds_.DefaultHandler
+			youhandler.AddCommand(cmds_.Command{
+				Name:        "exit",
+				Description: "Exit back to the main cli",
+			})
+			youhandler.AddCommand(cmds_.Command{
+				Name:        "clear",
+				Description: "Clears the screen",
+			})
+
+			for {
+				youhandler.SetPrompt("YouAI > ")
+				text := youhandler.GetInput()
+				if text == "exit" {
+					break
+				}
+				if text == "clear" {
+					h.Handle(text)
+					continue
+				}
+				err, resp := YouAI.SendMessage(text, false)
+				if err != nil {
+					log.Fatalf("Error sending message to YouAI: %v", err)
+				}
+				if resp.StatusCode == 200 {
+					continue
+				}
+			}
+
 			return nil
 		},
 	})

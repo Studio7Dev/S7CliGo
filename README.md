@@ -34,7 +34,8 @@ Commands
 | `blackbox` | Interact with BlackBox Programming AI Chat |
 | `searx` | Use Searx Search Engine |
 | `movie` | Search for a movie with TMDB |
-| `bingai`| Interact with the Bing AI from `bing.com/chat`
+| `bingai`| Interact with the Bing AI from `bing.com/chat`|
+| `youai` | Interact with `you.com` AI (YouAI) |
 | `img-gen` | Generate images from text prompts, using AI |
 | `enable-tcp` | Enable TCP API Usage |
 | `enable-http`| Enable Web API Usage |
@@ -142,7 +143,17 @@ curl -N -X POST -H "Content-Type: application/json" --data '{"message":"def hell
 ```curl
 curl -N -X POST -H "Content-Type: application/json" --data "{\"message\":\"def hello()\"}" http://localhost:8080/blackbox
 ```
+### YouAI
+#### Linux
+```curl
+curl -N -X POST -H "Content-Type: application/json" --data '{"message":"def hello()"}' http://localhost:8080/youai
+```
+#### Windows
+```curl
+curl -N -X POST -H "Content-Type: application/json" --data "{\"message\":\"def hello()\"}" http://localhost:8080/youai
+```
 ---
+
 ## TCP Implementations
 ---
 ### Merlin
@@ -160,4 +171,8 @@ ai bing hi how are you? can you code?
 ### BlackBox
 ```
 ai blackbox hi how are you? can you code?
+```
+### YouAI (you.com)
+```
+ai youai hi how are you? can you code?
 ```

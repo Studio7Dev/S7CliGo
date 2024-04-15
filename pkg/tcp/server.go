@@ -7,6 +7,7 @@ import (
 	MerlinAI "CLI/pkg/utils/merlin"
 	"CLI/pkg/utils/sydney"
 	"CLI/pkg/utils/util"
+	"CLI/pkg/utils/youai"
 	"bufio"
 	"context"
 	"encoding/json"
@@ -175,6 +176,47 @@ func handleCommand(conn net.Conn, message string) {
 			}
 			fmt.Print("\r\n")
 
+		}
+		if Aname == "youai" {
+			message_content := strings.Join(args[2:], " ")
+			YouAI := youai.YouAIClient{}
+			err, resp := YouAI.SendMessage(message_content, true)
+			if err != nil {
+				conn.Write([]byte("Error: " + err.Error() + "\n"))
+			}
+			reader := bufio.NewReader(resp.Body)
+			for {
+				line, err := reader.ReadString('\n')
+				if err != nil {
+					if err == io.EOF {
+						conn.Write([]byte("\n\n[DONE]"))
+						break
+					}
+					break
+				}
+				// starts with
+				if strings.HasPrefix(line, "data: ") {
+					// remove "data:" prefix
+					line = strings.TrimPrefix(line, "data: ")
+					// remove leading/trailing whitespace
+					line = strings.TrimSpace(line)
+					// check if line is empty
+					if len(line) == 0 {
+						continue
+					}
+					if strings.HasPrefix(line, `{"youChatToken": "`) {
+						jsondata := make(map[string]interface{})
+						err := json.Unmarshal([]byte(line), &jsondata)
+						if err != nil {
+							log.Println("Error parsing JSON:", err)
+							continue
+						}
+						// fmt.Print(jsondata["youChatToken"])
+						conn.Write([]byte(jsondata["youChatToken"].(string)))
+					}
+
+				}
+			}
 		}
 
 	}

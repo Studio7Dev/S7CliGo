@@ -35,6 +35,7 @@ type Data struct {
 	MerlinAuthToken  string `json:"merlin_auth_token"`
 	HugginFaceCookie string `json:"huggingface_cookie"`
 	BlackBoxCookie   string `json:"blackbox_cookie"`
+	YouAICookie      string `json:"youai_cookie"`
 	Username         string `json:"username"`
 	Password         string `json:"password"`
 	TcpHost          string `json:"tcphost"`

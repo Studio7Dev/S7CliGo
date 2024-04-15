@@ -7,6 +7,7 @@ import (
 	MerlinAI "CLI/pkg/utils/merlin"
 	"CLI/pkg/utils/sydney"
 	"CLI/pkg/utils/util"
+	"CLI/pkg/utils/youai"
 	"bufio"
 	"context"
 	"encoding/json"
@@ -246,6 +247,68 @@ func BlackBoxChat(w http.ResponseWriter, r *http.Request) {
 			w.Write([]byte(line))
 			w.(http.Flusher).Flush()
 		}
+	} else {
+		http.Error(w, "Only POST requests supported", http.StatusNotImplemented)
+		return
+	}
+}
+func YouAIChat(w http.ResponseWriter, r *http.Request) {
+	if r.Method == http.MethodPost {
+		body, err := ioutil.ReadAll(r.Body)
+		if err != nil {
+			http.Error(w, "Failed to read request body", http.StatusInternalServerError)
+			return
+		}
+		bodyJson := make(map[string]interface{})
+		err = json.Unmarshal(body, &bodyJson)
+		if err != nil {
+			http.Error(w, "Failed to parse request body", http.StatusBadRequest)
+			return
+		}
+		message_content := bodyJson["message"].(string)
+		YouAI := youai.YouAIClient{}
+		err, resp := YouAI.SendMessage(message_content, true)
+		if err != nil {
+			http.Error(w, "Error: "+err.Error(), http.StatusInternalServerError)
+			return
+		}
+		reader := bufio.NewReader(resp.Body)
+		for {
+			line, err := reader.ReadString('\n')
+			if err != nil {
+				if err == io.EOF {
+					w.Write([]byte("\n[DONE]"))
+					w.(http.Flusher).Flush()
+					break
+				}
+				break
+			}
+			// starts with
+			if strings.HasPrefix(line, "data: ") {
+				// remove "data:" prefix
+				line = strings.TrimPrefix(line, "data: ")
+				// remove leading/trailing whitespace
+				line = strings.TrimSpace(line)
+				// check if line is empty
+				if len(line) == 0 {
+					continue
+				}
+				if strings.HasPrefix(line, `{"youChatToken": "`) {
+					jsondata := make(map[string]interface{})
+					err := json.Unmarshal([]byte(line), &jsondata)
+					if err != nil {
+						http.Error(w, "Error: "+err.Error(), http.StatusInternalServerError)
+					}
+					// fmt.Print(jsondata["youChatToken"])
+					w.Write([]byte(jsondata["youChatToken"].(string)))
+					w.(http.Flusher).Flush()
+				}
+
+			}
+		}
+	} else {
+		http.Error(w, "Only POST requests supported", http.StatusNotImplemented)
+		return
 	}
 }
 
@@ -260,6 +323,7 @@ func NewHttpServer() {
 	http.HandleFunc("/hug", HugChat)
 	http.HandleFunc("/bing", BingChat)
 	http.HandleFunc("/blackbox", BlackBoxChat)
+	http.HandleFunc("/youai", YouAIChat)
 	fmt.Println("HTTP server started on:", settings.Httphost)
 	// Start the web server on port 8080 and handle requests to localhost.
 	if err := http.ListenAndServe(settings.Httphost, nil); err != nil {

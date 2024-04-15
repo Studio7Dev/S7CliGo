@@ -17,6 +17,13 @@ var (
 func main() {
 	// gui.GuiAPP()
 	// httpserver.NewHttpServer()
+	// YouAI := youai.YouAIClient{}
+	// err, resp := YouAI.SendMessage("what ai model are you", false)
+	// if err != nil {
+	// 	fmt.Println("Error sending message to YouAI:", err)
+	// 	return
+	// }
+	// fmt.Println(resp.StatusCode)
 	// os.Exit(0)
 	settings, err := f_.LoadSettings()
 	if err != nil {
