@@ -341,6 +341,7 @@ func (f Funcs) SettingsPage() {
 		form.GetFormItemByLabel("Merlin Auth Token").(*tview.InputField).SetText("")
 		form.GetFormItemByLabel("Hugging Face Cookie").(*tview.InputField).SetText("")
 		form.GetFormItemByLabel("Blackbox Cookie").(*tview.InputField).SetText("")
+		form.GetFormItemByLabel("YouAI Cookie").(*tview.InputField).SetText("")
 	})
 	pages.AddPage(fmt.Sprintf("settings_%d", 1), form, true, true)
 
