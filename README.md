@@ -107,18 +107,22 @@ cd SshServer
 ### Merlin
 ```curl
 curl -N -X POST -H "Content-Type: application/json" --data '{"message":"hi"}' http://localhost:8080/merlin
+curl -N -X POST -H "Content-Type: application/json" --data "{\"message\":\"hi\"}" http://localhost:8080/merlin
 ```
 ### HuggingFace
 ```curl
 curl -N -X POST -H "Content-Type: application/json" --data '{"message":"hi how are you", "model":"mistralai/Mistral-7B-Instruct-v0.2"}' http://localhost:8080/hug
+curl -N -X POST -H "Content-Type: application/json" --data "{\"message\":\"hi how are you\", \"model\":\"mistralai/Mistral-7B-Instruct-v0.2\"}" http://localhost:8080/hug
 ```
 ### BingAI
 ```curl
 curl -N -X POST -H "Content-Type: application/json" --data '{"message":"hi how are you"}' http://localhost:8080/bing
+curl -N -X POST -H "Content-Type: application/json" --data "{\"message\":\"hi how are you\"}" http://localhost:8080/bing
 ```
 ### BlackBox
 ```curl
 curl -N -X POST -H "Content-Type: application/json" --data '{"message":"def hello()"}' http://localhost:8080/blackbox
+curl -N -X POST -H "Content-Type: application/json" --data "{\"message\":\"def hello()\"}" http://localhost:8080/blackbox
 ```
 ---
 ## TCP Implementations
