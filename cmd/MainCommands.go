@@ -5,6 +5,7 @@ import (
 	"CLI/pkg/misc"
 	tcpserver "CLI/pkg/tcp"
 	BlackBox "CLI/pkg/utils/blackbox"
+	"CLI/pkg/utils/goliath"
 	HugginFace "CLI/pkg/utils/huggingface"
 	Searx "CLI/pkg/utils/searx"
 	"CLI/pkg/utils/sydney"
@@ -719,12 +720,57 @@ func (m *MC) Init(h cmds_.Handler) cmds_.Handler {
 					h.Handle(text)
 					continue
 				}
+				if text == "" {
+					continue
+				}
 				err, resp := YouAI.SendMessage(text, false)
 				if err != nil {
 					log.Fatalf("Error sending message to YouAI: %v", err)
 				}
 				if resp.StatusCode == 200 {
 					continue
+				}
+			}
+
+			return nil
+		},
+	})
+	h.AddCommand(Command{
+		Name:        "goliath",
+		Description: "Interact with Goliath AI from Anthropic",
+		Args:        []Arg{},
+		Exec: func(input []string, this cmds_.Command) error {
+
+			client := goliath.GoliathClient{}
+			goliath_handler := cmds_.DefaultHandler
+			goliath_handler.AddCommand(cmds_.Command{
+				Name:        "exit",
+				Description: "Exit back to the main cli",
+			})
+			goliath_handler.AddCommand(cmds_.Command{
+				Name:        "clear",
+				Description: "Clears the screen",
+			})
+			for {
+				goliath_handler.SetPrompt("Goliath AI > ")
+				message := goliath_handler.GetInput()
+				if message == "exit" {
+					break
+				}
+				if message == "" {
+					continue
+				}
+				if message == "clear" {
+					h.Handle(message)
+					continue
+				}
+				resp, err := client.SendMessage(message, false)
+				if err != nil {
+					//fmt.Println("Error sending message to Goliath:", err)
+					continue
+				}
+				if resp.StatusCode != 400 {
+
 				}
 			}
 
