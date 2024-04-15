@@ -84,6 +84,7 @@ cd SshServer
   "merlin_auth_token": "",
   "huggingface_cookie": "",
   "blackbox_cookie": "",
+  "youai_cookie":"",
   "username": "admin",
   "password": "admin",
   "tcphost":"0.0.0.0:1337",
