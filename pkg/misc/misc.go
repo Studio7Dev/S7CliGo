@@ -276,6 +276,7 @@ func (f Funcs) SettingsPage() {
 		HugginFaceCookie string `json:"huggingface_cookie"`
 		BlackBoxCookie   string `json:"blackbox_cookie"`
 		YouAICookie      string `json:"youai_cookie"`
+		GoliathAuthToken string `json:"goliath_auth_token"`
 		Username         string `json:"username"`
 		Password         string `json:"password"`
 		TcpHost          string `json:"tcphost"`
@@ -302,6 +303,7 @@ func (f Funcs) SettingsPage() {
 	form.AddInputField("Hugging Face Cookie", result.HugginFaceCookie, 50, nil, nil)
 	form.AddInputField("Blackbox Cookie", result.BlackBoxCookie, 50, nil, nil)
 	form.AddInputField("YouAI Cookie", result.YouAICookie, 50, nil, nil)
+	form.AddInputField("Goliath Auth Token", result.GoliathAuthToken, 50, nil, nil)
 	form.AddInputField("TCP Host", result.TcpHost, 50, nil, nil)
 	form.AddInputField("HTTP Host", result.Httphost, 50, nil, nil)
 	form.AddInputField("Username", result.Username, 50, nil, nil)
@@ -313,6 +315,7 @@ func (f Funcs) SettingsPage() {
 			HugginFaceCookie: form.GetFormItemByLabel("Hugging Face Cookie").(*tview.InputField).GetText(),
 			BlackBoxCookie:   form.GetFormItemByLabel("Blackbox Cookie").(*tview.InputField).GetText(),
 			YouAICookie:      form.GetFormItemByLabel("YouAI Cookie").(*tview.InputField).GetText(),
+			GoliathAuthToken: form.GetFormItemByLabel("Goliath Auth Token").(*tview.InputField).GetText(),
 			TcpHost:          form.GetFormItemByLabel("TCP Host").(*tview.InputField).GetText(),
 			Httphost:         form.GetFormItemByLabel("HTTP Host").(*tview.InputField).GetText(),
 			Username:         form.GetFormItemByLabel("Username").(*tview.InputField).GetText(),
