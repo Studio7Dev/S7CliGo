@@ -71,8 +71,8 @@ cd SshServer
 {
     "host":"0.0.0.0",
     "port":"22",
-    "userdb":"/mnt/c/Users/Administrator/Desktop/CLI/SshServer/users.txt",
-    "working_dir":"/mnt/c/Users/Administrator/Desktop/CLI/",
+    "userdb":"./SshServer/users.txt",
+    "working_dir":"../",
     "server_key":"/root/.ssh/id_rsa",
     "cli_binary":"go",
     "cli_cmd_args":["/usr/local/go/bin/go", "run", "main.go"]

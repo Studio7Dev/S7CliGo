@@ -271,11 +271,14 @@ func (f Funcs) SettingsPage() {
 	}
 
 	type Data struct {
-		Key1     string `json:"merlin_auth_token"`
-		Key2     string `json:"huggingface_cookie"`
-		Key3     string `json:"blackbox_cookie"`
-		Username string `json:"username"`
-		Password string `json:"password"`
+		MerlinAuthToken  string `json:"merlin_auth_token"`
+		HugginFaceCookie string `json:"huggingface_cookie"`
+		BlackBoxCookie   string `json:"blackbox_cookie"`
+		YouAICookie      string `json:"youai_cookie"`
+		Username         string `json:"username"`
+		Password         string `json:"password"`
+		TcpHost          string `json:"tcphost"`
+		Httphost         string `json:"httphost"`
 	}
 
 	var result Data
@@ -294,19 +297,25 @@ func (f Funcs) SettingsPage() {
 	form.SetBorder(true)
 	form.SetTitleAlign(tview.AlignCenter)
 	form.SetButtonsAlign(tview.AlignCenter)
-	form.AddInputField("Merlin Auth Token", result.Key1, 50, nil, nil)
-	form.AddInputField("Hugging Face Cookie", result.Key2, 50, nil, nil)
-	form.AddInputField("Blackbox Cookie", result.Key3, 50, nil, nil)
+	form.AddInputField("Merlin Auth Token", result.MerlinAuthToken, 50, nil, nil)
+	form.AddInputField("Hugging Face Cookie", result.HugginFaceCookie, 50, nil, nil)
+	form.AddInputField("Blackbox Cookie", result.BlackBoxCookie, 50, nil, nil)
+	form.AddInputField("YouAI Cookie", result.YouAICookie, 50, nil, nil)
+	form.AddInputField("TCP Host", result.TcpHost, 50, nil, nil)
+	form.AddInputField("HTTP Host", result.Httphost, 50, nil, nil)
 	form.AddInputField("Username", result.Username, 50, nil, nil)
 	form.AddInputField("Password", result.Password, 50, nil, nil)
 	form.AddButton("Save", func() {
 		// Save the updated settings to the JSON file
 		updatedData := Data{
-			Key1:     form.GetFormItemByLabel("Merlin Auth Token").(*tview.InputField).GetText(),
-			Key2:     form.GetFormItemByLabel("Hugging Face Cookie").(*tview.InputField).GetText(),
-			Key3:     form.GetFormItemByLabel("Blackbox Cookie").(*tview.InputField).GetText(),
-			Username: form.GetFormItemByLabel("Username").(*tview.InputField).GetText(),
-			Password: form.GetFormItemByLabel("Password").(*tview.InputField).GetText(),
+			MerlinAuthToken:  form.GetFormItemByLabel("Merlin Auth Token").(*tview.InputField).GetText(),
+			HugginFaceCookie: form.GetFormItemByLabel("Hugging Face Cookie").(*tview.InputField).GetText(),
+			BlackBoxCookie:   form.GetFormItemByLabel("Blackbox Cookie").(*tview.InputField).GetText(),
+			YouAICookie:      form.GetFormItemByLabel("YouAI Cookie").(*tview.InputField).GetText(),
+			TcpHost:          form.GetFormItemByLabel("TCP Host").(*tview.InputField).GetText(),
+			Httphost:         form.GetFormItemByLabel("HTTP Host").(*tview.InputField).GetText(),
+			Username:         form.GetFormItemByLabel("Username").(*tview.InputField).GetText(),
+			Password:         form.GetFormItemByLabel("Password").(*tview.InputField).GetText(),
 		}
 		// Write the updated settings to the JSON file
 		updatedJSON, err := json.MarshalIndent(updatedData, "", "  ")
