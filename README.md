@@ -84,7 +84,9 @@ cd SshServer
   "huggingface_cookie": "",
   "blackbox_cookie": "",
   "username": "admin",
-  "password": "admin"
+  "password": "admin",
+  "tcphost":"0.0.0.0:1337",
+  "httphost":"0.0.0.0:8080"
 }
 ```
 # Stuff
