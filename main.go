@@ -25,6 +25,16 @@ func main() {
 	// }
 	// fmt.Println(resp.StatusCode)
 	// os.Exit(0)
+	// client := goliath.GoliathClient{}
+	// resp, err := client.SendMessage("hi can you write a simple python hello world?", false)
+	// if err != nil {
+	// 	fmt.Println("Error sending message to Goliath:", err)
+	// 	return
+	// }
+	// if resp.StatusCode != 400 {
+
+	// }
+	// os.Exit(0)
 	settings, err := f_.LoadSettings()
 	if err != nil {
 		fmt.Println(err)

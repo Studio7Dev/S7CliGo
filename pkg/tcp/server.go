@@ -3,6 +3,7 @@ package tcpserver
 import (
 	"CLI/pkg/misc"
 	BlackBox "CLI/pkg/utils/blackbox"
+	"CLI/pkg/utils/goliath"
 	HugginFace "CLI/pkg/utils/huggingface"
 	MerlinAI "CLI/pkg/utils/merlin"
 	"CLI/pkg/utils/sydney"
@@ -217,6 +218,53 @@ func handleCommand(conn net.Conn, message string) {
 
 				}
 			}
+		}
+		if Aname == "goliath" {
+			message_content := strings.Join(args[2:], " ")
+			client := goliath.GoliathClient{}
+			resp, err := client.SendMessage(message_content, true)
+			if err != nil {
+				fmt.Println("Error sending message to Goliath:", err)
+				return
+			}
+			reader := bufio.NewReader(resp.Body)
+			for {
+				if err != nil {
+					if err == io.EOF {
+						break
+					}
+					conn.Write([]byte("\n\n[DONE]"))
+				}
+				line, err := reader.ReadString('\n')
+				if err != nil {
+					if err == io.EOF {
+						conn.Write([]byte("\n\n[DONE]"))
+						break
+					}
+					return
+				}
+				if strings.HasPrefix(line, "data: ") {
+					line = line[6:]
+					jsondata := make(map[string]interface{})
+					err := json.Unmarshal([]byte(line), &jsondata)
+					if err != nil {
+						log.Println("Error parsing JSON:", err)
+						continue
+					}
+					if jsondata["choices"] != nil {
+						content_ := jsondata["choices"]
+						for _, choice := range content_.([]interface{}) {
+							choice = choice.(map[string]interface{})["delta"]
+							content := choice.(map[string]interface{})["content"]
+							if content != nil {
+								conn.Write([]byte(content.(string)))
+							}
+						}
+					}
+				}
+
+			}
+
 		}
 
 	}

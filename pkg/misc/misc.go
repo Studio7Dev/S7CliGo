@@ -32,6 +32,7 @@ type Funcs struct {
 }
 
 type Data struct {
+	GoliathAuthToken string `json:"goliath_auth_token"`
 	MerlinAuthToken  string `json:"merlin_auth_token"`
 	HugginFaceCookie string `json:"huggingface_cookie"`
 	BlackBoxCookie   string `json:"blackbox_cookie"`

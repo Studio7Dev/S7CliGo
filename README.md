@@ -106,6 +106,8 @@ cd SshServer
 #### Go to https://huggingface.co/chat, login and then get the cookie, im too lazy to explain just figure it out using the last step lmao
 #### YouAI
 #### Go to https://you.com/chat, open dev tools, send a chat to the ai, find the request for the chat in the network tab, look for the cookie section in the request and copy the entire thing as one line and paste it into the config, `youai_cookie` in settings.json
+#### Goliath AI (tune studio)
+#### Go to https://studio.tune.app/ and make an api key for `goliath_auth_token`
 ---
 ## WebAPI Implementations
 ---
@@ -154,6 +156,15 @@ curl -N -X POST -H "Content-Type: application/json" --data '{"message":"def hell
 ```curl
 curl -N -X POST -H "Content-Type: application/json" --data "{\"message\":\"def hello()\"}" http://localhost:8080/youai
 ```
+### GoliathAI
+#### Linux
+```curl
+curl -N -X POST -H "Content-Type: application/json" --data '{"message":"def hello()"}' http://localhost:8080/goliath
+```
+#### Windows
+```curl
+curl -N -X POST -H "Content-Type: application/json" --data "{\"message\":\"def hello()\"}" http://localhost:8080/goliath
+```
 ---
 
 ## TCP Implementations
@@ -177,4 +188,8 @@ ai blackbox hi how are you? can you code?
 ### YouAI (you.com)
 ```
 ai youai hi how are you? can you code?
+```
+### GoliathAI
+```
+ai goliath hi how are you? can you code?
 ```
