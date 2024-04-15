@@ -81,6 +81,7 @@ cd SshServer
 ## Cli Settings
 ```json
 {
+  "goliath_auth_token":"",
   "merlin_auth_token": "",
   "huggingface_cookie": "",
   "blackbox_cookie": "",
