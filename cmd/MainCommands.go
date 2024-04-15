@@ -668,8 +668,6 @@ func (m *MC) Init(h cmds_.Handler) cmds_.Handler {
 					url = urlParts[0]
 					// get time stamp and turn into string
 
-					// sleep for 1 sec
-
 					// save image to file with timestamp
 					filename := fmt.Sprintf("generated_image_%s_%s.png", timestamp, strconv.Itoa(id_))
 					fmt.Println("Image URL:", url)
