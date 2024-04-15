@@ -730,6 +730,8 @@ func (m *MC) Init(h cmds_.Handler) cmds_.Handler {
 				if resp.StatusCode == 200 {
 					continue
 				}
+				fmt.Println("\r\n")
+
 			}
 
 			return nil
@@ -767,11 +769,13 @@ func (m *MC) Init(h cmds_.Handler) cmds_.Handler {
 				resp, err := client.SendMessage(message, false)
 				if err != nil {
 					//fmt.Println("Error sending message to Goliath:", err)
+					fmt.Println("\r\n")
 					continue
 				}
 				if resp.StatusCode != 400 {
 
 				}
+				fmt.Println("\r\n")
 			}
 
 			return nil

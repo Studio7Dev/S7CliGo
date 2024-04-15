@@ -65,6 +65,7 @@ func (c GoliathClient) SendMessage(message string, raw bool) (http.Response, err
 		for {
 			if err != nil {
 				if err == io.EOF {
+
 					break
 				}
 				return http.Response{
