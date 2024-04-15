@@ -104,7 +104,8 @@ cd SshServer
 #### Go to https://www.blackbox.ai , open dev tools, send a chat to the ai, find the request for the chat in the network tab, look for the cookie section in the request and copy the entire thing as one line and paste it into the config, `blackbox_cookie` in settings.json
 #### Hugging Face
 #### Go to https://huggingface.co/chat, login and then get the cookie, im too lazy to explain just figure it out using the last step lmao
-
+#### YouAI
+#### Go to https://you.com/chat, open dev tools, send a chat to the ai, find the request for the chat in the network tab, look for the cookie section in the request and copy the entire thing as one line and paste it into the config, `youai_cookie` in settings.json
 ---
 ## WebAPI Implementations
 ---
