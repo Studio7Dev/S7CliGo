@@ -1,5 +1,5 @@
 settings.json
 push.sh
-./data/bingcookies.json
-./data/huggingfacecookies.json
-./data/youaicookies.json
+data/bingcookies.json
+data/huggingfacecookies.json
+data/youaicookies.json
