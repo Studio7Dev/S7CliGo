@@ -40,8 +40,7 @@ type Searx_Struct struct {
 }
 
 var (
-	f_            = misc.Funcs{}
-	settings, err = f_.LoadSettings()
+	f_ = misc.Funcs{}
 )
 
 func (m *MC) Run(h cmds_.Handler) {
@@ -357,7 +356,7 @@ func (m *MC) Init(h cmds_.Handler) cmds_.Handler {
 						results_ := Searx_.Run(message)
 
 						var results []Searx_Struct
-						err = json.Unmarshal([]byte(results_), &results)
+						err := json.Unmarshal([]byte(results_), &results)
 						if err != nil {
 							log.Fatal(err)
 						}
@@ -761,9 +760,9 @@ func (m *MC) Init(h cmds_.Handler) cmds_.Handler {
 					continue
 				}
 				if resp.StatusCode != 400 {
-
+					continue
 				}
-				fmt.Println("\r\n")
+				fmt.Print("\n\n")
 			}
 
 			return nil
