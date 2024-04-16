@@ -98,18 +98,20 @@ cd SshServer
 
 #### The Auth token is the Authorization header in the chat request, copy it and paste it into `merlin_auth_token` in settings.json
 
-
+#### Goliath AI from tune app: Go to https://studio.tune.app/ and make an api key for `goliath_auth_token`
 #### https://chromewebstore.google.com/detail/merlin-1-click-access-to/camppjleccjaphfdbohjdohecfnoikec
 
 ---
-#### Black Box AI
-#### Go to https://www.blackbox.ai , open dev tools, send a chat to the ai, find the request for the chat in the network tab, look for the cookie section in the request and copy the entire thing as one line and paste it into the config, `blackbox_cookie` in settings.json
-#### Hugging Face
-#### Go to https://huggingface.co/chat, login and then get the cookie, im too lazy to explain just figure it out using the last step lmao
-#### YouAI
-#### Go to https://you.com/chat, open dev tools, send a chat to the ai, find the request for the chat in the network tab, look for the cookie section in the request and copy the entire thing as one line and paste it into the config, `youai_cookie` in settings.json
-#### Goliath AI (tune studio)
-#### Go to https://studio.tune.app/ and make an api key for `goliath_auth_token`
+## Cookies
+### Im sure you know how to save cookies using `ace storage` from chrome ext store
+#### Get these
+```
+data/bingcookies.json - bing.com chat (no login required, if you forget to get this, the cli is capable of automatically getting it)
+data/huggingfacecookies.json - huggingface chat (have to be logged in)
+data/youaicookies.json - you.com/chat (have to be logged in)
+```
+
+
 ---
 ## WebAPI Implementations
 ---
