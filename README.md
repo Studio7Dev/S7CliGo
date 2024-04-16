@@ -171,7 +171,7 @@ curl -N -X POST -H "Content-Type: application/json" --data "{\"message\":\"def h
 ```
 ---
 
-## TCP Implementations
+## TCP Implementations (Raw Connection in Putty | telnet addr port, in bash terminal)
 ---
 ### Merlin
 ```
