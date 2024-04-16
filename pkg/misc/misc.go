@@ -6,13 +6,17 @@ import (
 	MerlinAI "CLI/pkg/utils/merlin"
 	"encoding/base64"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"io/ioutil"
 	"net/http"
 	"os"
 	"os/exec"
+	"path/filepath"
+	"runtime"
 	"strings"
+	"sync"
 
 	"github.com/rivo/tview"
 )
@@ -28,13 +32,13 @@ type SystemInfo struct {
 }
 
 type Funcs struct {
-	// Add any necessary functions or methods here
 }
 
 type Data struct {
 	GoliathAuthToken string `json:"goliath_auth_token"`
 	MerlinAuthToken  string `json:"merlin_auth_token"`
 	HugginFaceCookie string `json:"huggingface_cookie"`
+	BingCookie       string `json:"bing_cookie"`
 	BlackBoxCookie   string `json:"blackbox_cookie"`
 	YouAICookie      string `json:"youai_cookie"`
 	Username         string `json:"username"`
@@ -44,21 +48,18 @@ type Data struct {
 }
 
 func (f Funcs) DownloadImage(url, filepath string) error {
-	// Get the data from the URL
 	resp, err := http.Get(url)
 	if err != nil {
 		return err
 	}
 	defer resp.Body.Close()
 
-	// Create the file where we will store the image
 	file, err := os.Create(filepath)
 	if err != nil {
 		return err
 	}
 	defer file.Close()
 
-	// Copy the data from the response body to the file
 	_, err = io.Copy(file, resp.Body)
 	if err != nil {
 		return err
@@ -72,9 +73,6 @@ func (f Funcs) LoadSettings() (Data, error) {
 	if err != nil {
 		return Data{}, fmt.Errorf("error opening JSON file: %v", err)
 	}
-	//defer func(settingsFile *os.File) {
-	//	_ = settingsFile.Close()
-	//}(settingsFile)
 
 	data, err := ioutil.ReadAll(settingsFile)
 	if err != nil {
@@ -234,25 +232,21 @@ func (f Funcs) OpenUrl(url string) {
 		fmt.Println("\nOutput:", string(output[:]))
 	} else {
 		return
-		// fmt.Printf("Successfully started command '%s'\n", strings.Join(cmdArgs, " "))
 	}
 }
 
 func (f Funcs) ImageURLToBase64(url string) string {
-	// Fetch the image
 	resp, err := http.Get(url)
 	if err != nil {
 		return ""
 	}
 	defer resp.Body.Close()
 
-	// Read the image data
 	imageData, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		return ""
 	}
 
-	// Encode image data to base64
 	base64String := base64.StdEncoding.EncodeToString(imageData)
 
 	return base64String
@@ -276,6 +270,7 @@ func (f Funcs) SettingsPage() {
 		HugginFaceCookie string `json:"huggingface_cookie"`
 		BlackBoxCookie   string `json:"blackbox_cookie"`
 		YouAICookie      string `json:"youai_cookie"`
+		BingCookie       string `json:"bing_cookie"`
 		GoliathAuthToken string `json:"goliath_auth_token"`
 		Username         string `json:"username"`
 		Password         string `json:"password"`
@@ -301,19 +296,18 @@ func (f Funcs) SettingsPage() {
 	form.SetButtonsAlign(tview.AlignCenter)
 	form.AddInputField("Merlin Auth Token", result.MerlinAuthToken, 50, nil, nil)
 	form.AddInputField("Hugging Face Cookie", result.HugginFaceCookie, 50, nil, nil)
-	form.AddInputField("Blackbox Cookie", result.BlackBoxCookie, 50, nil, nil)
 	form.AddInputField("YouAI Cookie", result.YouAICookie, 50, nil, nil)
+	form.AddInputField("Bing Cookie", result.BingCookie, 50, nil, nil)
 	form.AddInputField("Goliath Auth Token", result.GoliathAuthToken, 50, nil, nil)
 	form.AddInputField("TCP Host", result.TcpHost, 50, nil, nil)
 	form.AddInputField("HTTP Host", result.Httphost, 50, nil, nil)
 	form.AddInputField("Username", result.Username, 50, nil, nil)
 	form.AddInputField("Password", result.Password, 50, nil, nil)
 	form.AddButton("Save", func() {
-		// Save the updated settings to the JSON file
 		updatedData := Data{
 			MerlinAuthToken:  form.GetFormItemByLabel("Merlin Auth Token").(*tview.InputField).GetText(),
 			HugginFaceCookie: form.GetFormItemByLabel("Hugging Face Cookie").(*tview.InputField).GetText(),
-			BlackBoxCookie:   form.GetFormItemByLabel("Blackbox Cookie").(*tview.InputField).GetText(),
+			BingCookie:       form.GetFormItemByLabel("Bing Cookie").(*tview.InputField).GetText(),
 			YouAICookie:      form.GetFormItemByLabel("YouAI Cookie").(*tview.InputField).GetText(),
 			GoliathAuthToken: form.GetFormItemByLabel("Goliath Auth Token").(*tview.InputField).GetText(),
 			TcpHost:          form.GetFormItemByLabel("TCP Host").(*tview.InputField).GetText(),
@@ -321,7 +315,6 @@ func (f Funcs) SettingsPage() {
 			Username:         form.GetFormItemByLabel("Username").(*tview.InputField).GetText(),
 			Password:         form.GetFormItemByLabel("Password").(*tview.InputField).GetText(),
 		}
-		// Write the updated settings to the JSON file
 		updatedJSON, err := json.MarshalIndent(updatedData, "", "  ")
 		if err != nil {
 			fmt.Println("Error marshalling updated settings:", err)
@@ -333,19 +326,10 @@ func (f Funcs) SettingsPage() {
 			return
 		}
 		fmt.Println("Settings file updated successfully")
-		// Write the updated settings to the JSON file
 		app.Stop()
 	})
 	form.AddButton("Cancel", func() {
-		// force_clear()
 		app.Stop()
-	})
-	// clear the form and reset the page
-	form.AddButton("Reset Cookies", func() {
-		form.GetFormItemByLabel("Merlin Auth Token").(*tview.InputField).SetText("")
-		form.GetFormItemByLabel("Hugging Face Cookie").(*tview.InputField).SetText("")
-		form.GetFormItemByLabel("Blackbox Cookie").(*tview.InputField).SetText("")
-		form.GetFormItemByLabel("YouAI Cookie").(*tview.InputField).SetText("")
 	})
 	pages.AddPage(fmt.Sprintf("settings_%d", 1), form, true, true)
 
@@ -353,4 +337,66 @@ func (f Funcs) SettingsPage() {
 		panic(err)
 	}
 
+}
+
+type CookieUtil struct{}
+type FileCookie struct {
+	Name  string `json:"name"`
+	Value string `json:"value"`
+}
+
+var initWithPath = sync.OnceFunc(func() {
+	if runtime.GOOS == "darwin" {
+		dir, err := os.UserConfigDir()
+		if err != nil {
+			return
+		}
+		full := filepath.Join(dir, "SydneyQt")
+		err = os.MkdirAll(full, 0750)
+		if err != nil {
+			return
+		}
+		withPathBaseDir = full
+	}
+})
+var withPathBaseDir string
+
+func (cu CookieUtil) FormatCookieString(cookies map[string]string) string {
+	str := ""
+	for k, v := range cookies {
+		str += k + "=" + v + "; "
+	}
+	return str
+}
+
+func (cu CookieUtil) WithPath(filename string) string {
+	initWithPath()
+	if withPathBaseDir == "" {
+		return filename
+	}
+	return filepath.Join(withPathBaseDir, filename)
+}
+
+func (cu CookieUtil) ReadCookiesFileRaw(path_ string) ([]FileCookie, error) {
+	v, err := os.ReadFile(cu.WithPath(path_))
+	if err != nil {
+		return nil, nil
+	}
+	var cookies []FileCookie
+	err = json.Unmarshal(v, &cookies)
+	if err != nil {
+		return nil, errors.New("failed to json.Unmarshal content of cookie file")
+	}
+	return cookies, nil
+}
+func (cu CookieUtil) ReadCookiesFile(path_ string) string {
+	res := map[string]string{}
+	cookies, err := cu.ReadCookiesFileRaw(path_)
+	if err != nil {
+		return ""
+	}
+	for _, cookie := range cookies {
+		res[cookie.Name] = cookie.Value
+	}
+	return cu.FormatCookieString(res)
 }

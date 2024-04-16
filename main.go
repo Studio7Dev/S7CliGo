@@ -11,6 +11,7 @@ import (
 
 var (
 	f_  = misc.Funcs{}
+	cu_ = misc.CookieUtil{}
 	MC_ = cmd.MC{}
 )
 
@@ -34,6 +35,13 @@ func main() {
 	// if resp.StatusCode != 400 {
 
 	// }
+	// cookies_, err := cu_.ReadCookiesFile("./data/huggingface.json")
+	// if err != nil {
+	// 	fmt.Println("Error reading cookies file:", err)
+	// 	return
+	// }
+	// fmt.Println(cookies_)
+
 	// os.Exit(0)
 	settings, err := f_.LoadSettings()
 	if err != nil {

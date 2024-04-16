@@ -37,6 +37,7 @@ Commands
 | `bingai`| Interact with the Bing AI from `bing.com/chat`|
 | `youai` | Interact with `you.com` AI (YouAI) |
 | `img-gen` | Generate images from text prompts, using AI |
+| `goliath` | Interact with Goliath AI from `https://studio.tune.app/` |
 | `enable-tcp` | Enable TCP API Usage |
 | `enable-http`| Enable Web API Usage |
 #### Available Models for HuggingFace

@@ -1,6 +1,7 @@
 package util
 
 import (
+	"CLI/pkg/misc"
 	"bytes"
 	"context"
 	"encoding/hex"
@@ -33,6 +34,11 @@ import (
 	getproxy "github.com/rapid7/go-get-proxied/proxy"
 )
 
+var (
+	f_            = misc.Funcs{}
+	settings, err = f_.LoadSettings()
+)
+
 func RandIntInclusive(min int, max int) int {
 	return min + rand.Intn(max-min+1)
 }
@@ -46,15 +52,15 @@ func Ternary[T any](expression bool, trueResult T, falseResult T) T {
 func MakeHTTPClient(proxy string, timeout time.Duration) (*http.Client, *req.Client, error) {
 	transport := http.DefaultTransport.(*http.Transport).Clone()
 	reqClient := req.C().ImpersonateChrome().SetCommonHeader("accept-language", "en-US,en;q=0.9")
-	if proxy != "" { // user filled proxy
+	if proxy != "" {
 		proxyURL, err := url.Parse(proxy)
 		if err != nil {
 			return nil, nil, err
 		}
 		transport.Proxy = http.ProxyURL(proxyURL)
 		reqClient.SetProxyURL(proxy)
-	} else { // try to get system proxy
-		log.SetOutput(io.Discard) // FIXME this is a dirty fix that may result in concurrency problems
+	} else {
+		log.SetOutput(io.Discard)
 		proxies := []getproxy.Proxy{
 			getproxy.NewProvider("").GetHTTPProxy("https://www.bing.com"),
 			getproxy.NewProvider("").GetHTTPSProxy("https://www.bing.com"),
@@ -69,7 +75,7 @@ func MakeHTTPClient(proxy string, timeout time.Duration) (*http.Client, *req.Cli
 				break
 			}
 		}
-		if sysProxy != nil { // valid system proxy
+		if sysProxy != nil {
 			transport.Proxy = http.ProxyURL(sysProxy.URL())
 			reqClient.SetProxyURL(sysProxy.URL().String())
 		}
@@ -130,7 +136,7 @@ type FileCookie struct {
 }
 
 func ReadCookiesFileRaw() ([]FileCookie, error) {
-	v, err := os.ReadFile(WithPath("data/bingcookies.json"))
+	v, err := os.ReadFile(WithPath(settings.BingCookie))
 	if err != nil {
 		return nil, nil
 	}
@@ -164,7 +170,7 @@ func UpdateCookiesFile(cookies map[string]string) error {
 	if err != nil {
 		return err
 	}
-	err = os.WriteFile(WithPath("data/bingcookies.json"), v, 0644)
+	err = os.WriteFile(WithPath(settings.BingCookie), v, 0644)
 	if err != nil {
 		return err
 	}
@@ -187,35 +193,27 @@ func FindFirst[T any](arr []T, function func(value T) bool) (T, bool) {
 	return empty, false
 }
 func ConvertImageToJpg(img []byte) ([]byte, error) {
-	// Decode the image from the []byte
 	src, _, err := image.Decode(bytes.NewReader(img))
 	if err != nil {
 		return nil, err
 	}
-	// Create a buffer to store the converted image
 	var buf bytes.Buffer
-	// Encode the image as jpg with quality 80
 	err = jpeg.Encode(&buf, src, &jpeg.Options{Quality: 80})
 	if err != nil {
 		return nil, err
 	}
-	// Return the buffer as a []byte
 	return buf.Bytes(), nil
 }
 func GenerateSecMSGec() string {
-	// Create a new local random generator
 	src := rand.NewSource(time.Now().UnixNano())
 	rng := rand.New(src)
 
-	// Create a byte slice of length 32
 	randomBytes := make([]byte, 32)
 
-	// Fill the slice with random bytes
 	for i := range randomBytes {
 		randomBytes[i] = byte(rng.Intn(256))
 	}
 
-	// Convert to hexadecimal
 	return hex.EncodeToString(randomBytes)
 }
 func GracefulPanic(err error) {
@@ -236,7 +234,7 @@ func OpenURL(url string) error {
 		args = []string{"/c", "start"}
 	case "darwin":
 		cmd = "open"
-	default: // "linux", "freebsd", "openbsd", "netbsd"
+	default:
 		cmd = "xdg-open"
 	}
 	args = append(args, url)
@@ -255,7 +253,6 @@ func ReadDebugOptionSets() (debugOptionsSets []string) {
 		GracefulPanic(err)
 	}
 	if len(debugOptionsSets) != 0 {
-		//slog.Warn("Enable debug options sets", "v", debugOptionsSets)
 	}
 	return
 }
@@ -264,18 +261,15 @@ var initWithPath = sync.OnceFunc(func() {
 	if runtime.GOOS == "darwin" {
 		dir, err := os.UserConfigDir()
 		if err != nil {
-			//slog.Error("Cannot get user config dir", "err", err)
 			return
 		}
 		full := filepath.Join(dir, "SydneyQt")
 		err = os.MkdirAll(full, 0750)
 		if err != nil {
-			//slog.Error("Cannot mkdir config", "err", err)
 			return
 		}
 		withPathBaseDir = full
 	}
-	//slog.Info("Init withPathBaseDir", "v", withPathBaseDir)
 })
 var withPathBaseDir string
 

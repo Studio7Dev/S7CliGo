@@ -40,7 +40,6 @@ func MerlinChat(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, "Failed to parse request body", http.StatusBadRequest)
 			return
 		}
-		// Process the request body
 		message_content := bodyJson["message"].(string)
 		authToken := settings.MerlinAuthToken
 		chatID := "43ac5495-e1e1-4a68-9115-" + random.String(8)
@@ -87,11 +86,9 @@ func MerlinChat(w http.ResponseWriter, r *http.Request) {
 
 			w.Write([]byte(content))
 			w.(http.Flusher).Flush()
-			//conn.Write([]byte(content))
 		}
 		w.Write([]byte("\n[DONE]"))
 		w.(http.Flusher).Flush()
-		//conn.Write([]byte("\n[DONE]"))
 		if err := scanner.Err(); err != nil {
 			return
 		}
@@ -115,16 +112,14 @@ func HugChat(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, "Failed to parse request body", http.StatusBadRequest)
 			return
 		}
-		// Process the request body
 		model_ := bodyJson["model"].(string)
 		message_content := bodyJson["message"].(string)
 
 		client := HugginFace.NewHug()
-		cookie := settings.HugginFaceCookie
 
-		ChatId := client.ChangeModel(model_, cookie)
-		Id_ := client.GetMsgUID(ChatId, cookie)
-		err, r := client.SendMessage(message_content, ChatId, Id_, cookie, true)
+		ChatId := client.ChangeModel(model_)
+		Id_ := client.GetMsgUID(ChatId)
+		err, r := client.SendMessage(message_content, ChatId, Id_, true)
 		if err != nil && r.Body == nil {
 			w.Write([]byte("Error: " + err.Error() + "\n"))
 		}
@@ -133,7 +128,6 @@ func HugChat(w http.ResponseWriter, r *http.Request) {
 			line, err := reader.ReadString('\n')
 			if err != nil {
 				if err == io.EOF {
-					//conn.Write([]byte("\n[DONE]"))
 					break
 				}
 
@@ -144,11 +138,9 @@ func HugChat(w http.ResponseWriter, r *http.Request) {
 			}
 			var event map[string]interface{}
 			if err := json.Unmarshal([]byte(line), &event); err != nil {
-				//conn.Write([]byte("Error: " + err.Error() + "\n"))
 				continue
 			}
 			if event["type"] == "stream" {
-				//conn.Write([]byte(event["token"].(string)))
 				w.Write([]byte(event["token"].(string)))
 				w.(http.Flusher).Flush()
 			}
@@ -230,7 +222,6 @@ func BlackBoxChat(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, "Failed to parse request body", http.StatusBadRequest)
 			return
 		}
-		// Process the request body
 		message_content := bodyJson["message"].(string)
 		BlackBox_ := BlackBox.NewBlackboxClient()
 		reply := BlackBox_.SendMessage(message_content, true)
@@ -238,7 +229,6 @@ func BlackBoxChat(w http.ResponseWriter, r *http.Request) {
 			reader := bufio.NewReader(reply.Body)
 			line, err := reader.ReadString('\n')
 			if err != nil {
-				//conn.Write([]byte("Error: " + err.Error() + "\n"))
 				if err == io.EOF {
 					w.Write([]byte("\n[DONE]"))
 					w.(http.Flusher).Flush()
@@ -284,13 +274,9 @@ func YouAIChat(w http.ResponseWriter, r *http.Request) {
 				}
 				break
 			}
-			// starts with
 			if strings.HasPrefix(line, "data: ") {
-				// remove "data:" prefix
 				line = strings.TrimPrefix(line, "data: ")
-				// remove leading/trailing whitespace
 				line = strings.TrimSpace(line)
-				// check if line is empty
 				if len(line) == 0 {
 					continue
 				}

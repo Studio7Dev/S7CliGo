@@ -1,6 +1,7 @@
 package huggingface
 
 import (
+	"CLI/pkg/misc"
 	"bufio"
 	"encoding/json"
 	"fmt"
@@ -23,6 +24,12 @@ func NewHug() *ChatClient {
 	}
 }
 
+var (
+	f_            = misc.Funcs{}
+	settings, err = f_.LoadSettings()
+	cookie        = misc.CookieUtil{}.ReadCookiesFile(settings.HugginFaceCookie)
+)
+
 func (s *ChatClient) FindRandomUUID(text string) string {
 	uuids := make([]string, 0)
 
@@ -43,7 +50,8 @@ func (s *ChatClient) FindRandomUUID(text string) string {
 	return ""
 }
 
-func (s *ChatClient) GetMsgUID(chatID string, cookie string) string {
+func (s *ChatClient) GetMsgUID(chatID string) string {
+
 	client := &http.Client{}
 	req, err := http.NewRequest("GET", "https://huggingface.co/chat/conversation/"+chatID+"/__data.json?x-sveltekit-invalidated=11", nil)
 	if err != nil {
@@ -72,7 +80,7 @@ func (s *ChatClient) GetMsgUID(chatID string, cookie string) string {
 	return s.FindRandomUUID(string(bodyText))
 }
 
-func (s *ChatClient) ChangeModel(model string, cookie string) string {
+func (s *ChatClient) ChangeModel(model string) string {
 	client := &http.Client{}
 	var data = strings.NewReader(fmt.Sprintf(`{"model":"%s","preprompt":""}`, model))
 	req, err := http.NewRequest("POST", "https://huggingface.co/chat/conversation", data)
@@ -109,7 +117,7 @@ func (s *ChatClient) ChangeModel(model string, cookie string) string {
 	return string(fmt.Sprint(convId))
 }
 
-func (c *ChatClient) SendMessage(message string, convId string, Id string, cookie string, raw bool) (error, http.Response) {
+func (c *ChatClient) SendMessage(message string, convId string, Id string, raw bool) (error, http.Response) {
 	data := strings.NewReader(fmt.Sprintf(`{"inputs":"%s","id":"%s","is_retry":false,"is_continue":false,"web_search":false,"files":[]}`, message, Id))
 	req, err := http.NewRequest("POST", "https://huggingface.co/chat/conversation/"+convId, data)
 	if err != nil {

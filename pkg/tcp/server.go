@@ -46,7 +46,6 @@ func handleCommand(conn net.Conn, message string) {
 				reader := bufio.NewReader(reply.Body)
 				line, err := reader.ReadString('\n')
 				if err != nil {
-					//conn.Write([]byte("Error: " + err.Error() + "\n"))
 					if err == io.EOF {
 						conn.Write([]byte("\n\n[DONE]"))
 					}
@@ -58,11 +57,10 @@ func handleCommand(conn net.Conn, message string) {
 		if Aname == "hug" {
 			model_ := args[2]
 			client := HugginFace.NewHug()
-			cookie := settings.HugginFaceCookie
 			message_content := strings.Join(args[3:], " ")
-			ChatId := client.ChangeModel(model_, cookie)
-			Id_ := client.GetMsgUID(ChatId, cookie)
-			err, r := client.SendMessage(message_content, ChatId, Id_, cookie, true)
+			ChatId := client.ChangeModel(model_)
+			Id_ := client.GetMsgUID(ChatId)
+			err, r := client.SendMessage(message_content, ChatId, Id_, true)
 			if err != nil && r.Body == nil {
 				conn.Write([]byte("Error: " + err.Error() + "\n"))
 			}
@@ -195,13 +193,9 @@ func handleCommand(conn net.Conn, message string) {
 					}
 					break
 				}
-				// starts with
 				if strings.HasPrefix(line, "data: ") {
-					// remove "data:" prefix
 					line = strings.TrimPrefix(line, "data: ")
-					// remove leading/trailing whitespace
 					line = strings.TrimSpace(line)
-					// check if line is empty
 					if len(line) == 0 {
 						continue
 					}

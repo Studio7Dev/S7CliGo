@@ -39,6 +39,7 @@ type Params struct {
 var (
 	f_            = misc.Funcs{}
 	settings, err = f_.LoadSettings()
+	cookie        = misc.CookieUtil{}.ReadCookiesFile(settings.YouAICookie)
 )
 
 func (c YouAIClient) NewUuid() string {
@@ -81,7 +82,6 @@ func (c YouAIClient) ParamBuilder(message string) string {
 	prompt_parms += "&conversationTurnId=" + url.QueryEscape(params.ConversationTurnID)
 	prompt_parms += "&pastChatLength=" + strconv.Itoa(params.PastChatLength)
 	prompt_parms += "&selectedChatMode=" + url.QueryEscape(params.SelectedChatMode)
-	// urlencode
 	urlencoded := prompt_parms
 	return baseurl + urlencoded
 
@@ -97,7 +97,7 @@ func (c YouAIClient) SendMessage(message string, raw bool) (error, http.Response
 	req.Header.Set("accept", "text/event-stream")
 	req.Header.Set("accept-language", "en-GB,en-US;q=0.9,en;q=0.8")
 	req.Header.Set("cache-control", "no-cache")
-	req.Header.Set("cookie", settings.YouAICookie)
+	req.Header.Set("cookie", cookie)
 	req.Header.Set("referer", "https://you.com/search?q=hi&fromSearchBar=true&tbm=youchat&chatMode=default")
 	req.Header.Set("sec-ch-ua", `"Google Chrome";v="123", "Not:A-Brand";v="8", "Chromium";v="123"`)
 	req.Header.Set("sec-ch-ua-arch", `"x86"`)
@@ -115,12 +115,6 @@ func (c YouAIClient) SendMessage(message string, raw bool) (error, http.Response
 	if err != nil {
 		log.Fatal(err)
 	}
-	// defer resp.Body.Close()
-	// bodyText, err := io.ReadAll(resp.Body)
-	// if err != nil {
-	// 	log.Fatal(err)
-	// }
-	// fmt.Printf("%s\n", bodyText)
 
 	contentType := resp.Header.Get("Content-Type")
 	if contentType != "text/event-stream;charset=utf-8" {
@@ -142,13 +136,9 @@ func (c YouAIClient) SendMessage(message string, raw bool) (error, http.Response
 					StatusCode: 402,
 				}
 			}
-			// starts with
 			if strings.HasPrefix(line, "data: ") {
-				// remove "data:" prefix
 				line = strings.TrimPrefix(line, "data: ")
-				// remove leading/trailing whitespace
 				line = strings.TrimSpace(line)
-				// check if line is empty
 				if len(line) == 0 {
 					continue
 				}

@@ -62,28 +62,27 @@ func (m *MC) Init(h cmds_.Handler) cmds_.Handler {
 
 	type Command = cmds_.Command
 	type Arg = cmds_.Arg
-	// Clear command
 	h.AddCommand(cmds_.Command{
 		Name:        "clear",
 		Description: "Clears the console.",
 		Args:        []Arg{},
 		Exec: func(input []string, this Command) error {
-			os_switch := make(map[string]func()) //Initialize it
+			os_switch := make(map[string]func())
 			os_switch["linux"] = func() {
-				cmd := exec.Command("clear") //Linux example, its tested
+				cmd := exec.Command("clear")
 				cmd.Stdout = os.Stdout
 				cmd.Run()
 			}
 			os_switch["windows"] = func() {
-				cmd := exec.Command("cmd", "/c", "cls") //Windows example, its tested
+				cmd := exec.Command("cmd", "/c", "cls")
 				cmd.Stdout = os.Stdout
 				cmd.Run()
 			}
 
-			value, ok := os_switch[runtime.GOOS] //runtime.GOOS -> linux, windows, darwin etc.
-			if ok {                              //if we defined a clear func for that platform:
-				value() //we execute it
-			} else { //unsupported platform
+			value, ok := os_switch[runtime.GOOS]
+			if ok {
+				value()
+			} else {
 				fmt.Println("Failed; Your terminal isn't ANSI! :(")
 			}
 			f_.Banner()
@@ -129,7 +128,6 @@ func (m *MC) Init(h cmds_.Handler) cmds_.Handler {
 		Exec: func(input []string, this Command) error {
 			client := HugginFace.NewHug()
 			ChatId := "6608a05392dfb775db102588"
-			cookie := settings.HugginFaceCookie
 			for {
 				DefaultHandlerx2 := cmds_.DefaultHandler
 				DefaultHandlerx2.SetPrompt("Hugging Face > ")
@@ -163,7 +161,7 @@ func (m *MC) Init(h cmds_.Handler) cmds_.Handler {
 						Description: "Google AI",
 						Exec: func(input []string, this cmds_.Command) error {
 							model_ := this.Name
-							ChatId = client.ChangeModel(model_, cookie)
+							ChatId = client.ChangeModel(model_)
 							return nil
 						},
 					})
@@ -173,7 +171,7 @@ func (m *MC) Init(h cmds_.Handler) cmds_.Handler {
 						Description: "Mixtral Chat AI v0.1",
 						Exec: func(input []string, this cmds_.Command) error {
 							model_ := this.Name
-							ChatId = client.ChangeModel(model_, cookie)
+							ChatId = client.ChangeModel(model_)
 							return nil
 						},
 					})
@@ -183,7 +181,7 @@ func (m *MC) Init(h cmds_.Handler) cmds_.Handler {
 						Description: "Mixtral Chat AI v0.2",
 						Exec: func(input []string, this cmds_.Command) error {
 							model_ := this.Name
-							ChatId = client.ChangeModel(model_, cookie)
+							ChatId = client.ChangeModel(model_)
 							return nil
 						},
 					})
@@ -192,7 +190,7 @@ func (m *MC) Init(h cmds_.Handler) cmds_.Handler {
 						Description: "Facebook (Meta) Llama AI",
 						Exec: func(input []string, this cmds_.Command) error {
 							model_ := this.Name
-							ChatId = client.ChangeModel(model_, cookie)
+							ChatId = client.ChangeModel(model_)
 							return nil
 						},
 					})
@@ -201,7 +199,7 @@ func (m *MC) Init(h cmds_.Handler) cmds_.Handler {
 						Description: "NousResearch x Mixtral-8x7B",
 						Exec: func(input []string, this cmds_.Command) error {
 							model_ := this.Name
-							ChatId = client.ChangeModel(model_, cookie)
+							ChatId = client.ChangeModel(model_)
 							return nil
 						},
 					})
@@ -210,7 +208,7 @@ func (m *MC) Init(h cmds_.Handler) cmds_.Handler {
 						Description: "CodeLlama (Programming Assistant AI)",
 						Exec: func(input []string, this cmds_.Command) error {
 							model_ := this.Name
-							ChatId = client.ChangeModel(model_, cookie)
+							ChatId = client.ChangeModel(model_)
 							return nil
 						},
 					})
@@ -219,7 +217,7 @@ func (m *MC) Init(h cmds_.Handler) cmds_.Handler {
 						Description: "OpenChat 3.5 (GPT 3.5 Turbo)",
 						Exec: func(input []string, this cmds_.Command) error {
 							model_ := this.Name
-							ChatId = client.ChangeModel(model_, cookie)
+							ChatId = client.ChangeModel(model_)
 							return nil
 						},
 					})
@@ -242,8 +240,8 @@ func (m *MC) Init(h cmds_.Handler) cmds_.Handler {
 					continue
 				}
 
-				Id_ := client.GetMsgUID(ChatId, cookie)
-				err, r := client.SendMessage(message, ChatId, Id_, cookie, true)
+				Id_ := client.GetMsgUID(ChatId)
+				err, r := client.SendMessage(message, ChatId, Id_, true)
 				if err != nil && r.Body == nil {
 					log.Fatal(err)
 				}
@@ -304,7 +302,11 @@ func (m *MC) Init(h cmds_.Handler) cmds_.Handler {
 					reader := bufio.NewReader(reply.Body)
 					line, err := reader.ReadString('\n')
 					if err != nil {
-						return err
+						if err == io.EOF {
+							break
+						} else {
+							fmt.Println(err)
+						}
 					}
 					fmt.Print(line)
 				}
@@ -459,11 +461,7 @@ func (m *MC) Init(h cmds_.Handler) cmds_.Handler {
 								image_format := poster[len(poster)-3:]
 								var source_url string
 								var yN bool
-								// var base *huh.Theme = huh.ThemeBase()
 								var dracula *huh.Theme = huh.ThemeCharm()
-								// var base16 *huh.Theme = huh.ThemeBase16()
-								// var charm *huh.Theme = huh.ThemeCharm()
-								// var catppuccin *huh.Theme = huh.ThemeCatppuccin()
 								form := huh.NewForm(
 									huh.NewGroup(
 										huh.NewSelect[string]().
@@ -483,15 +481,12 @@ func (m *MC) Init(h cmds_.Handler) cmds_.Handler {
 								if err != nil {
 									log.Fatal(err)
 								}
-								// fmt.Println("> " + source_url)
 
 								if image_format == "jpg" || image_format == "png" {
 									fmt.Println("Poster: " + poster)
 								} else {
 									fmt.Println("No poster available")
 								}
-								//imageb64 := f_.ImageURLToBase64(poster)
-								//img(image_format, title_, imageb64)
 								if yN {
 									f_.OpenUrl(source_url)
 								}
@@ -647,12 +642,10 @@ func (m *MC) Init(h cmds_.Handler) cmds_.Handler {
 				return nil
 			}
 
-			// create image
 			image, err := sydneyAPI.GenerateImage(generativeImage)
 			if err != nil {
 				log.Fatalf("Error generating image: %v", err)
 			}
-			// get current path
 			currentDir, err := os.Getwd()
 			if err != nil {
 				log.Fatalf("Error getting current directory: %v", err)
@@ -664,15 +657,11 @@ func (m *MC) Init(h cmds_.Handler) cmds_.Handler {
 				id_ := 0
 				for _, url := range image.ImageURLs {
 					id_ += 1
-					// split the url by "?"
 					urlParts := strings.Split(url, "?")
 					url = urlParts[0]
-					// get time stamp and turn into string
 
-					// save image to file with timestamp
 					filename := fmt.Sprintf("generated_image_%s_%s.png", timestamp, strconv.Itoa(id_))
 					fmt.Println("Image URL:", url)
-					// Save the image to a file
 					os := runtime.GOOS
 					if os == "windows" {
 						err = f_.DownloadImage(url, filepath.Join(currentDir, "data", "generated_images", filename))
@@ -768,7 +757,6 @@ func (m *MC) Init(h cmds_.Handler) cmds_.Handler {
 				}
 				resp, err := client.SendMessage(message, false)
 				if err != nil {
-					//fmt.Println("Error sending message to Goliath:", err)
 					fmt.Println("\r\n")
 					continue
 				}
@@ -781,15 +769,6 @@ func (m *MC) Init(h cmds_.Handler) cmds_.Handler {
 			return nil
 		},
 	})
-	// h.AddCommand(Command{
-	// 	Name:        "gui",
-	// 	Description: "Launch a graphical user interface for the application",
-	// 	Args:        []Arg{},
-	// 	Exec: func(input []string, this cmds_.Command) error {
-	// 		gui.GuiAPP()
-	// 		return nil
-	// 	},
-	// })
 	h.AddCommand(Command{
 		Name:        "enable-tcp",
 		Description: "Enable TCP mode for the application",
