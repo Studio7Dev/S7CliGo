@@ -277,6 +277,9 @@ func handleCommand(conn net.Conn, message string) {
 			}
 			chat_id := c[0]["conversation_id"].(string)
 			resp, err := tuneclient.SendMessage(message_content, chat_id, "rohan/mixtral-8x7b-inst-v0-1-32k", false, true)
+			if err != nil {
+				log.Fatalf("Error sending message to TuneAI: %v", err)
+			}
 			reader := bufio.NewReader(resp.Body)
 			for {
 				line, err := reader.ReadBytes('\n')
