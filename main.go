@@ -42,6 +42,10 @@ func main() {
 	// }
 	// fmt.Println(cookies_)
 
+	// new_cookies, acctkn, err := tuneclient.GetCookieAuto()
+	// fmt.Println("New Cookies:", new_cookies)
+	// fmt.Println("Access Token:", acctkn)
+
 	// os.Exit(0)
 	settings, err := f_.LoadSettings()
 	if err != nil {

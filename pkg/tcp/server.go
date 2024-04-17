@@ -7,6 +7,7 @@ import (
 	HugginFace "CLI/pkg/utils/huggingface"
 	MerlinAI "CLI/pkg/utils/merlin"
 	"CLI/pkg/utils/sydney"
+	"CLI/pkg/utils/tuneapp"
 	"CLI/pkg/utils/util"
 	"CLI/pkg/utils/youai"
 	"bufio"
@@ -259,6 +260,46 @@ func handleCommand(conn net.Conn, message string) {
 
 			}
 
+		}
+		if Aname == "tuneai" {
+			message_content := strings.Join(args[2:], " ")
+			tuneclient := tuneapp.TuneClient{}
+			settings_, err := f_.LoadSettings()
+			if err != nil {
+				log.Fatalf("Error loading settings: %v", err)
+			}
+			if settings_.TuneAppAccessToken == "" {
+				tuneclient.NewChat()
+			}
+			c, err := tuneclient.GetConversations()
+			if err != nil {
+				log.Fatalf("Error getting conversations: %v", err)
+			}
+			chat_id := c[0]["conversation_id"].(string)
+			resp, err := tuneclient.SendMessage(message_content, chat_id, "rohan/mixtral-8x7b-inst-v0-1-32k", false, true)
+			reader := bufio.NewReader(resp.Body)
+			for {
+				line, err := reader.ReadBytes('\n')
+				if err != nil {
+					if err == io.EOF {
+						conn.Write([]byte("\n\n[DONE]"))
+						break
+					} else {
+						break
+					}
+				}
+				var response map[string]interface{}
+				// decode line
+				json.Unmarshal(line, &response)
+				if err != nil {
+					fmt.Println("Error decoding JSON response:", err)
+				}
+				value_ := response["value"]
+				if value_ != nil {
+					conn.Write([]byte(value_.(string)))
+				}
+
+			}
 		}
 
 	}

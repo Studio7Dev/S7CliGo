@@ -10,6 +10,7 @@ import (
 	Searx "CLI/pkg/utils/searx"
 	"CLI/pkg/utils/sydney"
 	Movie_ "CLI/pkg/utils/tmdb"
+	"CLI/pkg/utils/tuneapp"
 	"CLI/pkg/utils/util"
 	"CLI/pkg/utils/youai"
 	httpserver "CLI/pkg/web"
@@ -765,6 +766,144 @@ func (m *MC) Init(h cmds_.Handler) cmds_.Handler {
 				fmt.Print("\n\n")
 			}
 
+			return nil
+		},
+	})
+	h.AddCommand(Command{
+		Name:        "tuneai",
+		Description: "chat.tune.app AI interface",
+		Args:        []Arg{},
+		Exec: func(input []string, this cmds_.Command) error {
+			tuneclient := tuneapp.TuneClient{}
+			settings_, err := f_.LoadSettings()
+			if err != nil {
+				log.Fatalf("Error loading settings: %v", err)
+			}
+			if settings_.TuneAppAccessToken == "" {
+				tuneclient.NewChat()
+			}
+			c, err := tuneclient.GetConversations()
+			if err != nil {
+				log.Fatalf("Error getting conversations: %v", err)
+			}
+			chat_id := c[0]["conversation_id"].(string)
+			tunehandler := cmds_.DefaultHandler
+			tunehandler.AddCommand(cmds_.Command{
+				Name:        "exit",
+				Description: "Exit back to the main cli",
+			})
+			tunehandler.AddCommand(cmds_.Command{
+				Name:        "clear",
+				Description: "Clears the screen",
+			})
+			tunehandler.AddCommand(cmds_.Command{
+				Name:        "chatid",
+				Description: "Get the current chat ID",
+				Exec: func(input []string, this cmds_.Command) error {
+					fmt.Println("Current chat ID:", chat_id)
+					return nil
+				},
+			})
+			tunehandler.AddCommand(cmds_.Command{
+				Name:        "list-convos",
+				Description: "List all conversations",
+				Exec: func(input []string, this cmds_.Command) error {
+					c, err := tuneclient.GetConversations()
+					if err != nil {
+						log.Fatalf("Error getting conversations: %v", err)
+					}
+					conversations := make([]map[string]interface{}, len(c))
+					for i, convo := range c {
+						conversations[i] = convo
+					}
+					for _, convo := range conversations {
+						fmt.Println("Conversation ID:", convo["conversation_id"])
+						fmt.Println("Conversation Title:", convo["title"])
+					}
+					return nil
+				},
+			})
+			tunehandler.AddCommand(cmds_.Command{
+				Name:        "del-all",
+				Description: "Delete all conversations",
+				Exec: func(input []string, this cmds_.Command) error {
+					convo_ids, err := tuneclient.GetConversations()
+					if err != nil {
+						log.Fatalf("Error getting conversations: %v", err)
+					}
+					for _, convo := range convo_ids {
+						convo_id := convo["conversation_id"].(string)
+						err := tuneclient.DeleteConversation(convo_id)
+						if err != nil {
+							fmt.Println("Failed to delete conversation:", convo_id)
+							fmt.Println("Error: ", err)
+						} else {
+							fmt.Println("Deleted conversation: ", convo_id)
+						}
+					}
+					return nil
+				},
+			})
+			tunehandler.AddCommand(cmds_.Command{
+				Name:        "new-convo",
+				Description: "Start a new conversation",
+				Exec: func(input []string, this cmds_.Command) error {
+					chat_id = tuneclient.NewChat()
+					fmt.Println("New Conversation Created!, ID:", chat_id)
+					return nil
+				},
+			})
+			tunehandler.AddCommand(cmds_.Command{
+				Name:        "change-convo",
+				Description: "Change the current conversation",
+				Exec: func(input []string, this cmds_.Command) error {
+					fmt.Println("Please enter the conversation ID you want to switch to: ")
+					tunehandler.SetPrompt("Conversation ID: ")
+					chat_id = tunehandler.GetInput()
+					if chat_id == "" {
+						fmt.Println("Invalid conversation ID. Please try again.")
+						return nil
+					}
+					fmt.Println("Switched to conversation ID:", chat_id)
+					return nil
+				},
+			})
+			for {
+				tunehandler.SetPrompt("TuneAI > ")
+				message := tunehandler.GetInput()
+				if message == "exit" {
+					break
+				}
+				if message == "chatid" {
+					tunehandler.Handle(message)
+					continue
+				}
+				if message == "del-all" {
+					tunehandler.Handle(message)
+					continue
+				}
+				if message == "list-convos" {
+					tunehandler.Handle(message)
+					continue
+				}
+				if message == "change-convo" {
+					tunehandler.Handle(message)
+					continue
+				}
+				if message == "clear" {
+					h.Handle(message)
+					continue
+
+				}
+				if message == "new-convo" {
+					tunehandler.Handle(message)
+					continue
+				} else {
+					tuneclient.SendMessage(message, chat_id, "rohan/mixtral-8x7b-inst-v0-1-32k", false, false)
+					fmt.Println()
+				}
+
+			}
 			return nil
 		},
 	})

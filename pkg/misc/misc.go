@@ -35,16 +35,17 @@ type Funcs struct {
 }
 
 type Data struct {
-	GoliathAuthToken string `json:"goliath_auth_token"`
-	MerlinAuthToken  string `json:"merlin_auth_token"`
-	HugginFaceCookie string `json:"huggingface_cookie"`
-	BingCookie       string `json:"bing_cookie"`
-	BlackBoxCookie   string `json:"blackbox_cookie"`
-	YouAICookie      string `json:"youai_cookie"`
-	Username         string `json:"username"`
-	Password         string `json:"password"`
-	TcpHost          string `json:"tcphost"`
-	Httphost         string `json:"httphost"`
+	GoliathAuthToken   string `json:"goliath_auth_token"`
+	MerlinAuthToken    string `json:"merlin_auth_token"`
+	TuneAppAccessToken string `json:"tuneapp_auth_token"`
+	HugginFaceCookie   string `json:"huggingface_cookie"`
+	BingCookie         string `json:"bing_cookie"`
+	BlackBoxCookie     string `json:"blackbox_cookie"`
+	YouAICookie        string `json:"youai_cookie"`
+	Username           string `json:"username"`
+	Password           string `json:"password"`
+	TcpHost            string `json:"tcphost"`
+	Httphost           string `json:"httphost"`
 }
 
 func (f Funcs) DownloadImage(url, filepath string) error {
@@ -266,16 +267,17 @@ func (f Funcs) SettingsPage() {
 	}
 
 	type Data struct {
-		MerlinAuthToken  string `json:"merlin_auth_token"`
-		HugginFaceCookie string `json:"huggingface_cookie"`
-		BlackBoxCookie   string `json:"blackbox_cookie"`
-		YouAICookie      string `json:"youai_cookie"`
-		BingCookie       string `json:"bing_cookie"`
-		GoliathAuthToken string `json:"goliath_auth_token"`
-		Username         string `json:"username"`
-		Password         string `json:"password"`
-		TcpHost          string `json:"tcphost"`
-		Httphost         string `json:"httphost"`
+		MerlinAuthToken    string `json:"merlin_auth_token"`
+		HugginFaceCookie   string `json:"huggingface_cookie"`
+		BlackBoxCookie     string `json:"blackbox_cookie"`
+		YouAICookie        string `json:"youai_cookie"`
+		BingCookie         string `json:"bing_cookie"`
+		GoliathAuthToken   string `json:"goliath_auth_token"`
+		TuneAppAccessToken string `json:"tuneapp_auth_token"`
+		Username           string `json:"username"`
+		Password           string `json:"password"`
+		TcpHost            string `json:"tcphost"`
+		Httphost           string `json:"httphost"`
 	}
 
 	var result Data
@@ -295,25 +297,28 @@ func (f Funcs) SettingsPage() {
 	form.SetTitleAlign(tview.AlignCenter)
 	form.SetButtonsAlign(tview.AlignCenter)
 	form.AddInputField("Merlin Auth Token", result.MerlinAuthToken, 50, nil, nil)
+	form.AddInputField("Goliath Auth Token", result.GoliathAuthToken, 50, nil, nil)
+	form.AddInputField("TuneApp Auth Token", result.TuneAppAccessToken, 50, nil, nil)
 	form.AddInputField("Hugging Face Cookie", result.HugginFaceCookie, 50, nil, nil)
 	form.AddInputField("YouAI Cookie", result.YouAICookie, 50, nil, nil)
 	form.AddInputField("Bing Cookie", result.BingCookie, 50, nil, nil)
-	form.AddInputField("Goliath Auth Token", result.GoliathAuthToken, 50, nil, nil)
 	form.AddInputField("TCP Host", result.TcpHost, 50, nil, nil)
 	form.AddInputField("HTTP Host", result.Httphost, 50, nil, nil)
 	form.AddInputField("Username", result.Username, 50, nil, nil)
 	form.AddInputField("Password", result.Password, 50, nil, nil)
 	form.AddButton("Save", func() {
 		updatedData := Data{
-			MerlinAuthToken:  form.GetFormItemByLabel("Merlin Auth Token").(*tview.InputField).GetText(),
-			HugginFaceCookie: form.GetFormItemByLabel("Hugging Face Cookie").(*tview.InputField).GetText(),
-			BingCookie:       form.GetFormItemByLabel("Bing Cookie").(*tview.InputField).GetText(),
-			YouAICookie:      form.GetFormItemByLabel("YouAI Cookie").(*tview.InputField).GetText(),
-			GoliathAuthToken: form.GetFormItemByLabel("Goliath Auth Token").(*tview.InputField).GetText(),
-			TcpHost:          form.GetFormItemByLabel("TCP Host").(*tview.InputField).GetText(),
-			Httphost:         form.GetFormItemByLabel("HTTP Host").(*tview.InputField).GetText(),
-			Username:         form.GetFormItemByLabel("Username").(*tview.InputField).GetText(),
-			Password:         form.GetFormItemByLabel("Password").(*tview.InputField).GetText(),
+
+			HugginFaceCookie:   form.GetFormItemByLabel("Hugging Face Cookie").(*tview.InputField).GetText(),
+			BingCookie:         form.GetFormItemByLabel("Bing Cookie").(*tview.InputField).GetText(),
+			TuneAppAccessToken: form.GetFormItemByLabel("TuneApp Auth Token").(*tview.InputField).GetText(),
+			YouAICookie:        form.GetFormItemByLabel("YouAI Cookie").(*tview.InputField).GetText(),
+			GoliathAuthToken:   form.GetFormItemByLabel("Goliath Auth Token").(*tview.InputField).GetText(),
+			MerlinAuthToken:    form.GetFormItemByLabel("Merlin Auth Token").(*tview.InputField).GetText(),
+			TcpHost:            form.GetFormItemByLabel("TCP Host").(*tview.InputField).GetText(),
+			Httphost:           form.GetFormItemByLabel("HTTP Host").(*tview.InputField).GetText(),
+			Username:           form.GetFormItemByLabel("Username").(*tview.InputField).GetText(),
+			Password:           form.GetFormItemByLabel("Password").(*tview.InputField).GetText(),
 		}
 		updatedJSON, err := json.MarshalIndent(updatedData, "", "  ")
 		if err != nil {
@@ -399,4 +404,17 @@ func (cu CookieUtil) ReadCookiesFile(path_ string) string {
 		res[cookie.Name] = cookie.Value
 	}
 	return cu.FormatCookieString(res)
+}
+
+func (cu CookieUtil) ParseCookiesFromString(cookiesStr string) map[string]string {
+	cookies := map[string]string{}
+	for _, cookie := range strings.Split(cookiesStr, ";") {
+		cookie = strings.TrimSpace(cookie)
+		parts := strings.Split(cookie, "=")
+		if len(parts) < 2 {
+			continue
+		}
+		cookies[parts[0]] = strings.Join(parts[1:], "=")
+	}
+	return cookies
 }

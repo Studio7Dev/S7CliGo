@@ -7,6 +7,7 @@ import (
 	HugginFace "CLI/pkg/utils/huggingface"
 	MerlinAI "CLI/pkg/utils/merlin"
 	"CLI/pkg/utils/sydney"
+	"CLI/pkg/utils/tuneapp"
 	"CLI/pkg/utils/util"
 	"CLI/pkg/utils/youai"
 	"bufio"
@@ -366,6 +367,64 @@ func GoliathAIChat(w http.ResponseWriter, r *http.Request) {
 	}
 
 }
+func TuneAIChat(w http.ResponseWriter, r *http.Request) {
+	if r.Method == http.MethodPost {
+		body, err := ioutil.ReadAll(r.Body)
+		if err != nil {
+			http.Error(w, "Failed to read request body", http.StatusInternalServerError)
+			return
+		}
+		bodyJson := make(map[string]interface{})
+		err = json.Unmarshal(body, &bodyJson)
+		if err != nil {
+			http.Error(w, "Failed to parse request body", http.StatusBadRequest)
+			return
+		}
+		message_content := bodyJson["message"].(string)
+		tuneclient := tuneapp.TuneClient{}
+		settings_, err := f_.LoadSettings()
+		if err != nil {
+			log.Fatalf("Error loading settings: %v", err)
+		}
+		if settings_.TuneAppAccessToken == "" {
+			tuneclient.NewChat()
+		}
+		c, err := tuneclient.GetConversations()
+		if err != nil {
+			log.Fatalf("Error getting conversations: %v", err)
+		}
+		chat_id := c[0]["conversation_id"].(string)
+		resp, err := tuneclient.SendMessage(message_content, chat_id, "rohan/mixtral-8x7b-inst-v0-1-32k", false, true)
+		reader := bufio.NewReader(resp.Body)
+		for {
+			line, err := reader.ReadBytes('\n')
+			if err != nil {
+				if err == io.EOF {
+					w.Write([]byte("\n[DONE]"))
+					w.(http.Flusher).Flush()
+					break
+				} else {
+					break
+				}
+			}
+			var response map[string]interface{}
+			// decode line
+			json.Unmarshal(line, &response)
+			if err != nil {
+				fmt.Println("Error decoding JSON response:", err)
+			}
+			value_ := response["value"]
+			if value_ != nil {
+				w.Write([]byte(value_.(string)))
+				w.(http.Flusher).Flush()
+			}
+
+		}
+	} else {
+		http.Error(w, "Only POST requests supported", http.StatusNotImplemented)
+		return
+	}
+}
 
 func NewHttpServer() {
 	fmt.Println("Starting HTTP server...")
@@ -380,6 +439,7 @@ func NewHttpServer() {
 	http.HandleFunc("/blackbox", BlackBoxChat)
 	http.HandleFunc("/youai", YouAIChat)
 	http.HandleFunc("/goliath", GoliathAIChat)
+	http.HandleFunc("/tune", TuneAIChat)
 	fmt.Println("HTTP server started on:", settings.Httphost)
 	// Start the web server on port 8080 and handle requests to localhost.
 	if err := http.ListenAndServe(settings.Httphost, nil); err != nil {
