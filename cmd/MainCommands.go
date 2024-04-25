@@ -20,6 +20,7 @@ import (
 	"fmt"
 	"io"
 	"log"
+	"math/rand"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -155,72 +156,91 @@ func (m *MC) Init(h cmds_.Handler) cmds_.Handler {
 					fmt.Println("Available Models:")
 					fmt.Println("Use the TAB Button on your keyboard to cycle through the list of models")
 					Df := cmds_.DefaultHandler
+
+					models, err := client.GetModels()
+					if err != nil {
+						fmt.Println("Error getting models:", err)
+						return nil
+					}
 					Df.SetPrompt("> ")
-					Df.AddCommand(cmds_.Command{
-						Name:        "google/gemma-7b-it",
-						Description: "Google AI",
-						Exec: func(input []string, this cmds_.Command) error {
-							model_ := this.Name
-							ChatId = client.ChangeModel(model_)
-							return nil
-						},
-					})
+					for _, model := range models {
+						fmt.Println("> " + model)
+						Df.AddCommand(cmds_.Command{
+							Name:        model,
+							Description: "<",
+							Exec: func(input []string, this cmds_.Command) error {
+								model_ := this.Name
+								ChatId = client.ChangeModel(model_)
+								return nil
+							},
+						})
+					}
 
-					Df.AddCommand(cmds_.Command{
-						Name:        "mistralai/Mixtral-8x7B-Instruct-v0.1",
-						Description: "Mixtral Chat AI v0.1",
-						Exec: func(input []string, this cmds_.Command) error {
-							model_ := this.Name
-							ChatId = client.ChangeModel(model_)
-							return nil
-						},
-					})
+					// Df.AddCommand(cmds_.Command{
+					// 	Name:        "google/gemma-7b-it",
+					// 	Description: "Google AI",
+					// 	Exec: func(input []string, this cmds_.Command) error {
+					// 		model_ := this.Name
+					// 		ChatId = client.ChangeModel(model_)
+					// 		return nil
+					// 	},
+					// })
 
-					Df.AddCommand(cmds_.Command{
-						Name:        "mistralai/Mistral-7B-Instruct-v0.2",
-						Description: "Mixtral Chat AI v0.2",
-						Exec: func(input []string, this cmds_.Command) error {
-							model_ := this.Name
-							ChatId = client.ChangeModel(model_)
-							return nil
-						},
-					})
-					Df.AddCommand(cmds_.Command{
-						Name:        "meta-llama/Llama-2-70b-chat-hf",
-						Description: "Facebook (Meta) Llama AI",
-						Exec: func(input []string, this cmds_.Command) error {
-							model_ := this.Name
-							ChatId = client.ChangeModel(model_)
-							return nil
-						},
-					})
-					Df.AddCommand(cmds_.Command{
-						Name:        "NousResearch/Nous-Hermes-2-Mixtral-8x7B-DPO",
-						Description: "NousResearch x Mixtral-8x7B",
-						Exec: func(input []string, this cmds_.Command) error {
-							model_ := this.Name
-							ChatId = client.ChangeModel(model_)
-							return nil
-						},
-					})
-					Df.AddCommand(cmds_.Command{
-						Name:        "codellama/CodeLlama-70b-Instruct-hf",
-						Description: "CodeLlama (Programming Assistant AI)",
-						Exec: func(input []string, this cmds_.Command) error {
-							model_ := this.Name
-							ChatId = client.ChangeModel(model_)
-							return nil
-						},
-					})
-					Df.AddCommand(cmds_.Command{
-						Name:        "openchat/openchat-3.5-0106",
-						Description: "OpenChat 3.5 (GPT 3.5 Turbo)",
-						Exec: func(input []string, this cmds_.Command) error {
-							model_ := this.Name
-							ChatId = client.ChangeModel(model_)
-							return nil
-						},
-					})
+					// Df.AddCommand(cmds_.Command{
+					// 	Name:        "mistralai/Mixtral-8x7B-Instruct-v0.1",
+					// 	Description: "Mixtral Chat AI v0.1",
+					// 	Exec: func(input []string, this cmds_.Command) error {
+					// 		model_ := this.Name
+					// 		ChatId = client.ChangeModel(model_)
+					// 		return nil
+					// 	},
+					// })
+
+					// Df.AddCommand(cmds_.Command{
+					// 	Name:        "mistralai/Mistral-7B-Instruct-v0.2",
+					// 	Description: "Mixtral Chat AI v0.2",
+					// 	Exec: func(input []string, this cmds_.Command) error {
+					// 		model_ := this.Name
+					// 		ChatId = client.ChangeModel(model_)
+					// 		return nil
+					// 	},
+					// })
+					// Df.AddCommand(cmds_.Command{
+					// 	Name:        "meta-llama/Llama-2-70b-chat-hf",
+					// 	Description: "Facebook (Meta) Llama AI",
+					// 	Exec: func(input []string, this cmds_.Command) error {
+					// 		model_ := this.Name
+					// 		ChatId = client.ChangeModel(model_)
+					// 		return nil
+					// 	},
+					// })
+					// Df.AddCommand(cmds_.Command{
+					// 	Name:        "NousResearch/Nous-Hermes-2-Mixtral-8x7B-DPO",
+					// 	Description: "NousResearch x Mixtral-8x7B",
+					// 	Exec: func(input []string, this cmds_.Command) error {
+					// 		model_ := this.Name
+					// 		ChatId = client.ChangeModel(model_)
+					// 		return nil
+					// 	},
+					// })
+					// Df.AddCommand(cmds_.Command{
+					// 	Name:        "codellama/CodeLlama-70b-Instruct-hf",
+					// 	Description: "CodeLlama (Programming Assistant AI)",
+					// 	Exec: func(input []string, this cmds_.Command) error {
+					// 		model_ := this.Name
+					// 		ChatId = client.ChangeModel(model_)
+					// 		return nil
+					// 	},
+					// })
+					// Df.AddCommand(cmds_.Command{
+					// 	Name:        "openchat/openchat-3.5-0106",
+					// 	Description: "OpenChat 3.5 (GPT 3.5 Turbo)",
+					// 	Exec: func(input []string, this cmds_.Command) error {
+					// 		model_ := this.Name
+					// 		ChatId = client.ChangeModel(model_)
+					// 		return nil
+					// 	},
+					// })
 					for {
 						input_ := Df.GetInput()
 
@@ -238,6 +258,7 @@ func (m *MC) Init(h cmds_.Handler) cmds_.Handler {
 
 					}
 					continue
+
 				}
 
 				Id_ := client.GetMsgUID(ChatId)
@@ -780,7 +801,10 @@ func (m *MC) Init(h cmds_.Handler) cmds_.Handler {
 				log.Fatalf("Error loading settings: %v", err)
 			}
 			if settings_.TuneAppAccessToken == "" {
-				tuneclient.NewChat()
+				models := tuneclient.GetModels()
+				random_model := models[rand.Intn(len(models))]
+				fmt.Println(">>>> Using model:", random_model)
+				tuneclient.NewChat(random_model)
 			}
 			c, err := tuneclient.GetConversations()
 			if err != nil {
@@ -848,8 +872,43 @@ func (m *MC) Init(h cmds_.Handler) cmds_.Handler {
 				Name:        "new-convo",
 				Description: "Start a new conversation",
 				Exec: func(input []string, this cmds_.Command) error {
-					chat_id = tuneclient.NewChat()
-					fmt.Println("New Conversation Created!, ID:", chat_id)
+					models := tuneclient.GetModels()
+					if len(models) == 0 {
+						fmt.Println("No models available. Please check your TuneApp access token.")
+						return nil
+					}
+					// for range
+
+					tDf := cmds_.DefaultHandler
+					for i, model := range models {
+
+						fmt.Println(strconv.Itoa(i)+" >>> ", model)
+						tDf.AddCommand(cmds_.Command{
+							Name:        strconv.Itoa(i),
+							Description: "Select model " + model,
+							Exec: func(input []string, this cmds_.Command) error {
+
+								chat_id = tuneclient.NewChat(models[i])
+								fmt.Println("New Conversation Created!, ID:", chat_id)
+								return nil
+							},
+						})
+					}
+					for {
+						tDf.SetPrompt("Select Model > ")
+						message := tDf.GetInput()
+						if message == "exit" {
+							break
+						}
+						if message == "clear" {
+							h.Handle(message)
+							continue
+						}
+						tDf.Handle(message)
+						break
+					}
+
+					//fmt.Println("New Conversation Created!, ID:", chat_id)
 					return nil
 				},
 			})
@@ -873,6 +932,9 @@ func (m *MC) Init(h cmds_.Handler) cmds_.Handler {
 				message := tunehandler.GetInput()
 				if message == "exit" {
 					break
+				}
+				if message == "" {
+					continue
 				}
 				if message == "chatid" {
 					tunehandler.Handle(message)

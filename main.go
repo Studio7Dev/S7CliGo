@@ -46,7 +46,25 @@ func main() {
 	// fmt.Println("New Cookies:", new_cookies)
 	// fmt.Println("Access Token:", acctkn)
 
-	// os.Exit(0)
+	// hug := huggingface.ChatClient{}
+	// models, err := hug.GetModels()
+	// if err != nil {
+	// 	fmt.Println("Error getting HuggingFace models:", err)
+	// 	return
+	// }
+	// fmt.Println(models)
+	// client := huggingface.ChatClient{}
+	// models, err := client.GetModels()
+	// if err != nil {
+	// 	fmt.Println("Error getting models:", err)
+	// 	return
+	// }
+	// fmt.Println(models)
+	// // for model, desc := range models {
+	// // 	fmt.Printf("Model: %s\nDescription: %s\n\n", model, desc)
+	// // }
+
+	//os.Exit(0)
 	settings, err := f_.LoadSettings()
 	if err != nil {
 		fmt.Println(err)

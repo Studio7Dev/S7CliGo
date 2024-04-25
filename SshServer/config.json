@@ -3,7 +3,7 @@
     "port":"22",
     "userdb":"./SshServer/users.txt",
     "working_dir":"../",
-    "server_key":"/root/.ssh/id_rsa",
+    "server_key":"./SshServer/id_rsa",
     "cli_binary":"go",
-    "cli_cmd_args":["/usr/local/go/bin/go", "run", "main.go"]
+    "cli_cmd_args":["go", "run", "main.go"]
 }

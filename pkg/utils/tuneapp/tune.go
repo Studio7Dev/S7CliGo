@@ -34,7 +34,7 @@ func (c TuneClient) NewUuid() string {
 	return uuid_base.String()
 }
 
-func (c TuneClient) NewChat() string {
+func (c TuneClient) NewChat(model_name string) string {
 	if AccessToken == "" {
 		AccessToken = AccessToken_New
 	}
@@ -44,7 +44,8 @@ func (c TuneClient) NewChat() string {
 	}
 	chat_id := c.NewUuid()
 	client := &http.Client{}
-	req, err := http.NewRequest("GET", "https://chat.tune.app/api/new?conversation_id="+chat_id+"&model=rohan/mixtral-8x7b-inst-v0-1-32k&currency=USD", nil)
+
+	req, err := http.NewRequest("GET", "https://chat.tune.app/api/new?conversation_id="+chat_id+"&model="+model_name+"&currency=USD", nil)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -310,4 +311,50 @@ func (c TuneClient) DeleteConversation(conversationId string) error {
 		return nil
 	}
 	return err
+}
+func (c TuneClient) GetModels() []string {
+
+	client := &http.Client{}
+	var data = strings.NewReader(`{}`)
+	req, err := http.NewRequest("POST", "https://studio.tune.app/tune.Studio/ListPublicModels", data)
+	if err != nil {
+		log.Fatal(err)
+	}
+	req.Header.Set("accept", "*/*")
+	req.Header.Set("accept-language", "en-GB,en;q=0.9")
+	req.Header.Set("authorization", "Bearer null")
+	req.Header.Set("connect-protocol-version", "1")
+	req.Header.Set("content-type", "application/json")
+	req.Header.Set("cookie", "_ga_EN6NJLMZ17=GS1.1.1714074056.1.1.1714074062.0.0.0")
+	req.Header.Set("origin", "https://studio.tune.app")
+	req.Header.Set("priority", "u=1, i")
+	req.Header.Set("referer", "https://studio.tune.app/")
+	req.Header.Set("sec-ch-ua", `"Chromium";v="124", "Google Chrome";v="124", "Not-A.Brand";v="99"`)
+	req.Header.Set("sec-ch-ua-mobile", "?0")
+	req.Header.Set("sec-ch-ua-platform", `"Windows"`)
+	req.Header.Set("sec-fetch-dest", "empty")
+	req.Header.Set("sec-fetch-mode", "cors")
+	req.Header.Set("sec-fetch-site", "same-origin")
+	req.Header.Set("user-agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36")
+	resp, err := client.Do(req)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer resp.Body.Close()
+	bodyText, err := io.ReadAll(resp.Body)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	var json_data map[string]interface{}
+	err = json.Unmarshal(bodyText, &json_data)
+	if err != nil {
+		log.Fatal(err)
+	}
+	models := json_data["models"].([]interface{})
+	models_list := make([]string, len(models))
+	for i, model := range models {
+		models_list[i] = model.(map[string]interface{})["uri"].(string)
+	}
+	return models_list
 }

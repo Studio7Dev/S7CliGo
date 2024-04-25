@@ -387,7 +387,7 @@ func TuneAIChat(w http.ResponseWriter, r *http.Request) {
 			log.Fatalf("Error loading settings: %v", err)
 		}
 		if settings_.TuneAppAccessToken == "" {
-			tuneclient.NewChat()
+			tuneclient.NewChat("rohan/Meta-Llama-3-70B-Instruct")
 		}
 		c, err := tuneclient.GetConversations()
 		if err != nil {

@@ -12,6 +12,8 @@ import (
 	"regexp"
 	"strings"
 	"time"
+
+	"golang.org/x/net/html"
 )
 
 type ChatClient struct {
@@ -187,4 +189,87 @@ func (c *ChatClient) SendMessage(message string, convId string, Id string, raw b
 	}
 
 	return nil, *resp
+}
+
+func (c ChatClient) GetModels() ([]string, error) {
+	client := &http.Client{}
+	req, err := http.NewRequest("GET", "https://huggingface.co/chat/models", nil)
+	if err != nil {
+		log.Fatal(err)
+	}
+	req.Header.Set("accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7")
+	req.Header.Set("accept-language", "en-GB,en-US;q=0.9,en;q=0.8")
+	req.Header.Set("cache-control", "max-age=0")
+	req.Header.Set("cookie", "_ga=GA1.1.695792381.1711492971; __stripe_mid=1f7b2183-e484-497b-bb6a-1df73c8ad9ddbeaca1; token=wVUCLTYNPSmXIMRTElPuYAYAvnaXclCAKFbmrYVUZpWgLJWSzQrOvYLJEieNktjCueFdxsTcTXEUAjYxkShOoCAMoIqEZMhyhTBIsAfGNPvyLASsGXNQBursRrzoNYAh; token=wVUCLTYNPSmXIMRTElPuYAYAvnaXclCAKFbmrYVUZpWgLJWSzQrOvYLJEieNktjCueFdxsTcTXEUAjYxkShOoCAMoIqEZMhyhTBIsAfGNPvyLASsGXNQBursRrzoNYAh; hf-chat=ee19994f-12dd-4bd1-bb55-e8324018495a; _ga_8Q63TH4CSL=GS1.1.1713208077.22.0.1713208077.60.0.0; _ga_R4JMGZWPD9=GS1.1.1713214248.1.0.1713214255.0.0.0")
+	req.Header.Set("if-none-match", `W/"1rdws4r"`)
+	req.Header.Set("priority", "u=0, i")
+	req.Header.Set("sec-ch-ua", `"Chromium";v="124", "Google Chrome";v="124", "Not-A.Brand";v="99"`)
+	req.Header.Set("sec-ch-ua-mobile", "?0")
+	req.Header.Set("sec-ch-ua-platform", `"Windows"`)
+	req.Header.Set("sec-fetch-dest", "document")
+	req.Header.Set("sec-fetch-mode", "navigate")
+	req.Header.Set("sec-fetch-site", "same-origin")
+	req.Header.Set("sec-fetch-user", "?1")
+	req.Header.Set("upgrade-insecure-requests", "1")
+	req.Header.Set("user-agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36")
+	resp, err := client.Do(req)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer resp.Body.Close()
+	bodyText, err := io.ReadAll(resp.Body)
+	if err != nil {
+		log.Fatal(err)
+	}
+	// doc, err := html.Parse(strings.NewReader(string(bodyText)))
+	// if err != nil {
+	// 	log.Fatal(err)
+	// }
+	// var traverse func(*html.Node)
+	// traverse = func(n *html.Node) {
+	// 	if n.Type == html.ElementNode {
+	// 		fmt.Println(n.Data) // Print the name of the HTML element
+	// 	}
+	// 	for c := n.FirstChild; c != nil; c = c.NextSibling {
+	// 		traverse(c)
+	// 	}
+	// }
+
+	// Traverse the HTML document
+	// traverse(doc)
+
+	doc, err := html.Parse(strings.NewReader(string(bodyText)))
+	if err != nil {
+		fmt.Println("Error parsing HTML:", err)
+		return nil, err
+	}
+
+	// Find all "dt" tags and print their text
+	// make a string list
+	models := []string{}
+	var f func(*html.Node)
+	f = func(n *html.Node) {
+		if n.Type == html.ElementNode && n.Data == "dt" {
+			model_name := strings.Split(n.FirstChild.Data, " ")[0]
+			models = append(models, model_name)
+		}
+		for c := n.FirstChild; c != nil; c = c.NextSibling {
+			f(c)
+		}
+	}
+	f(doc)
+	// get elements by the html tag "dd"
+	// extract the text content of each "dd" element and append it to the models slice
+	var g func(*html.Node)
+	g = func(n *html.Node) {
+		if n.Type == html.ElementNode && n.Data == "dd" {
+			model_name := strings.TrimSpace(n.FirstChild.Data)
+			models = append(models, model_name)
+		}
+		for c := n.FirstChild; c != nil; c = c.NextSibling {
+			g(c)
+		}
+	}
+
+	return models, nil
 }

@@ -24,7 +24,7 @@ func (c GoliathClient) SendMessage(message string, raw bool) (http.Response, err
 		log.Fatal(err)
 	}
 	client := &http.Client{}
-	var data = strings.NewReader(`{"messages":[{"role":"user","content":"` + message + `"}],"model":"rohan/goliath-120b-16k-gptq","stream":true,"temperature":0.8,"max_tokens":16300}`)
+	var data = strings.NewReader(`{"messages":[{"role":"user","content":"` + message + `"}],"model":"rohan/openrouter-goliath-120b-4k","stream":true,"temperature":0.8,"max_tokens":16300}`)
 	req, err := http.NewRequest("POST", "https://proxy.tune.app/chat/completions", data)
 	if err != nil {
 		log.Fatal(err)

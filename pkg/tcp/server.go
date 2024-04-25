@@ -269,7 +269,7 @@ func handleCommand(conn net.Conn, message string) {
 				log.Fatalf("Error loading settings: %v", err)
 			}
 			if settings_.TuneAppAccessToken == "" {
-				tuneclient.NewChat()
+				tuneclient.NewChat("rohan/Meta-Llama-3-70B-Instruct")
 			}
 			c, err := tuneclient.GetConversations()
 			if err != nil {
