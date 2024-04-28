@@ -35,7 +35,8 @@ func YouAI(message string, chatlog *widget.Entry) error {
 		return nil
 	}
 	reader := bufio.NewReader(resp.Body)
-	chatlog.SetText(chatlog.Text + "YouAI" + ": " + "" + " ")
+	chatlog.SetText(chatlog.Text + "YouAI" + ": " + "" + "\n ")
+	chatlog.SetText(chatlog.Text + "=======================================================================================\n")
 	for {
 		line, err := reader.ReadString('\n')
 		if err != nil {
@@ -91,7 +92,8 @@ func TuneAppAI(message string, model_ string, chatlog *widget.Entry) error {
 		log.Fatalf("Error sending message: %v", err)
 	}
 	reader := bufio.NewReader(resp.Body)
-	chatlog.SetText(chatlog.Text + model_ + ": " + "" + " ")
+	chatlog.SetText(chatlog.Text + model_ + ": " + "" + "\n ")
+	chatlog.SetText(chatlog.Text + "=======================================================================================\n")
 	for {
 		line, err := reader.ReadBytes('\n')
 		if err != nil {
@@ -126,7 +128,8 @@ func BlackBoxAI(message string, chatlog *widget.Entry) error {
 	message_content := message
 	BlackBox_ := blackbox.NewBlackboxClient()
 	reply := BlackBox_.SendMessage(message_content, true)
-	chatlog.SetText(chatlog.Text + "BlackBox: " + "" + " ")
+	chatlog.SetText(chatlog.Text + "BlackBox: " + "" + "\n ")
+	chatlog.SetText(chatlog.Text + "=======================================================================================\n")
 	for {
 		reader := bufio.NewReader(reply.Body)
 		line, err := reader.ReadString('\n')
@@ -157,7 +160,8 @@ func BingAI(message string, chatlog *widget.Entry) error {
 		chatlog.SetText(chatlog.Text + err.Error() + "\n")
 		return err
 	}
-	chatlog.SetText(chatlog.Text + "Bing: " + "" + " ")
+	chatlog.SetText(chatlog.Text + "Bing: " + "" + "\n ")
+	chatlog.SetText(chatlog.Text + "=======================================================================================\n")
 	reader := bufio.NewReader(resp.Body)
 	for {
 		line, err := reader.ReadBytes('\n')
@@ -207,7 +211,8 @@ func MerlinAI_(message string, chatlog *widget.Entry) error {
 		return err
 	}
 	scanner := bufio.NewScanner(responseBody)
-	chatlog.SetText(chatlog.Text + "Merlin: " + "" + " ")
+	chatlog.SetText(chatlog.Text + "Merlin: " + "" + "\n ")
+	chatlog.SetText(chatlog.Text + "=======================================================================================\n")
 	for scanner.Scan() {
 		line := scanner.Text()
 		if line == "" {
@@ -269,7 +274,8 @@ func HuggingFaceAI(message string, model_ string, chatlog *widget.Entry) error {
 		return err
 	}
 	reader := bufio.NewReader(r.Body)
-	chatlog.SetText(chatlog.Text + model_ + ": " + "" + " ")
+	chatlog.SetText(chatlog.Text + model_ + ": " + "" + "\n ")
+	chatlog.SetText(chatlog.Text + "=======================================================================================\n")
 	for {
 		line, err := reader.ReadString('\n')
 		if err != nil {

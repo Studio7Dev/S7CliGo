@@ -14,6 +14,7 @@ import (
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/app"
 	"fyne.io/fyne/v2/container"
+	"fyne.io/fyne/v2/layout"
 	"fyne.io/fyne/v2/theme"
 	"fyne.io/fyne/v2/widget"
 )
@@ -45,33 +46,59 @@ func NewChatApp() *ChatApp {
 	w := a.NewWindow("S7 Gui V1")
 	// borderless window
 	//w.SetFullScreen(true)
-	w.Resize(fyne.NewSize(1000, 700))
+	w.Resize(fyne.NewSize(1000, 800))
 	if AppSettings.DarkMode {
 		a.Settings().SetTheme(theme.DarkTheme())
 	} else {
 		a.Settings().SetTheme(theme.LightTheme())
 	}
+	messagegrid := container.NewVBox()
+	messagegrid.Layout = layout.NewVBoxLayout()
 
-	input := widget.NewEntry()
-	input.PlaceHolder = "Type a message..."
+	messagegrid.Resize(fyne.NewSize(150, 20))
 
 	chatLog := widget.NewMultiLineEntry()
 	chatLog.Wrapping = fyne.TextWrapWord
 
-	chatLog.Resize(fyne.NewSize(1000, 500))
+	chatLog.Resize(fyne.NewSize(800, 600))
 	//chatLog.Disable()
 	chatLog.TextStyle.Monospace = true
 	chatLog.TextStyle.Symbol = true
 
+	scroll := container.NewVScroll(messagegrid)
+	scroll.SetMinSize(fyne.NewSize(150, 700))
+	scroll.Direction = container.ScrollBoth
 	chatLog.OnChanged = func(s string) {
 		chatLog.CursorRow = len(chatLog.Text) - 1
+		scroll.ScrollToBottom()
 
 	}
+	scrollborder := container.NewBorder(
+		nil,
+		nil,
+		nil,
+		nil,
+		scroll)
+	// UserMessages := []string{}
+	// AIMessages := []string{}
+	input := widget.NewEntry()
+	input.PlaceHolder = "Type a message..."
+	input.OnSubmitted = func(s string) {
+		if s != "" {
+			messagegrid.Add(NewUserMessageElement(s))
 
+			//chatLog.SetText(chatLog.Text + "You: " + text + "\n")
+			input.SetText("")
+			getAIResponse(s, chatLog)
+
+		}
+	}
 	SendBtn := widget.NewButton("Send", func() {
 		text := input.Text
 		if text != "" {
-			chatLog.SetText(chatLog.Text + "You: " + text + "\n")
+			messagegrid.Add(NewUserMessageElement(text))
+
+			//chatLog.SetText(chatLog.Text + "You: " + text + "\n")
 			input.SetText("")
 			getAIResponse(text, chatLog)
 
@@ -89,12 +116,21 @@ func NewChatApp() *ChatApp {
 	SettingsBtn := widget.NewButton("Settings", func() {
 		showSettingsModal(w, &ChatApp{a, w, input, chatLog})
 	})
+	MContainer := container.NewBorder(
+		nil,
+		nil,
+		scrollborder,
+		nil,
+		chatLog,
+	)
+	MContainer.Resize(fyne.NewSize(900, 600))
 	Container_ := container.NewBorder(
 		nil,
 		container.NewGridWithColumns(2, input, SendBtn),
 		nil,
 		container.NewGridWithRows(10, ExitBtn, ClearBtn, SettingsBtn, ChangeModelBtn),
-		container.NewAdaptiveGrid(1, chatLog),
+		MContainer,
+		// container.NewAdaptiveGrid(1, chatLog),
 	)
 	//menu := container.NewGridWithColumns(2, ExitBtn, ClearBtn)
 	//cont := container.NewBorder(menu, container.NewGridWithColumns(2, input, SendBtn), nil, nil, Container_)
@@ -103,8 +139,20 @@ func NewChatApp() *ChatApp {
 	return &ChatApp{a, w, input, chatLog}
 }
 
+// *****************************************************
+// Fix this layout bs
+func NewUserMessageElement(message string) *widget.RichText {
+	userMessage := widget.NewRichTextFromMarkdown(fmt.Sprintf("**You:** %s", message))
+	// userMessage.TextStyle.Bold = true
+	// userMessage.Alignment = fyne.TextAlignTrailing
+	userMessage.Wrapping = fyne.TextWrapWord
+
+	return userMessage
+}
+
 func getAIResponse(input string, chatlog *widget.Entry) string {
 	fmt.Println("Current model:", CurrentAIProvider)
+
 	if CurrentAIProvider == "merlin" {
 		handler.MerlinAI_(input, chatlog)
 	}
@@ -125,6 +173,7 @@ func getAIResponse(input string, chatlog *widget.Entry) string {
 	if CurrentAIProvider == "youai" {
 		handler.YouAI(input, chatlog)
 	}
+	chatlog.SetText(chatlog.Text + "=======================================================================================\n")
 	// TO DO: implement AI logic here
 	// for now, just return a simple response
 	return "I'm not sure I understand. Can you please rephrase?"
