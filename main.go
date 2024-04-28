@@ -17,11 +17,14 @@ import (
 	"fyne.io/fyne/v2/layout"
 	"fyne.io/fyne/v2/theme"
 	"fyne.io/fyne/v2/widget"
+	"golang.design/x/clipboard"
 )
 
 var (
 	f_                   = misc.Funcs{}
+	icns                 = misc.IconUtil{}
 	hugmodels, err       = huggingface.NewHug().GetModels()
+	cliperr              = clipboard.Init()
 	tuneclient           = tuneapp.TuneClient{}
 	tunemodels           = tuneclient.GetModels()
 	AppSettings, setterr = f_.LoadSettings()
@@ -38,20 +41,20 @@ type ChatApp struct {
 }
 
 func NewChatApp() *ChatApp {
-	// go func() {
-	// 	httpserver.NewHttpServer()
-	// }()
 	a := app.New()
 
 	w := a.NewWindow("S7 Gui V1")
-	// borderless window
-	//w.SetFullScreen(true)
-	w.Resize(fyne.NewSize(1000, 800))
+	w.Resize(fyne.NewSize(1025, 800))
+	w.SetFixedSize(true)
+	w.CenterOnScreen()
+	w.SetIcon(icns.Icon("appicon"))
+
 	if AppSettings.DarkMode {
 		a.Settings().SetTheme(theme.DarkTheme())
 	} else {
 		a.Settings().SetTheme(theme.LightTheme())
 	}
+
 	messagegrid := container.NewVBox()
 	messagegrid.Layout = layout.NewVBoxLayout()
 
@@ -61,7 +64,6 @@ func NewChatApp() *ChatApp {
 	chatLog.Wrapping = fyne.TextWrapWord
 
 	chatLog.Resize(fyne.NewSize(800, 600))
-	//chatLog.Disable()
 	chatLog.TextStyle.Monospace = true
 	chatLog.TextStyle.Symbol = true
 
@@ -79,15 +81,12 @@ func NewChatApp() *ChatApp {
 		nil,
 		nil,
 		scroll)
-	// UserMessages := []string{}
-	// AIMessages := []string{}
 	input := widget.NewEntry()
 	input.PlaceHolder = "Type a message..."
 	input.OnSubmitted = func(s string) {
 		if s != "" {
 			messagegrid.Add(NewUserMessageElement(s))
 
-			//chatLog.SetText(chatLog.Text + "You: " + text + "\n")
 			input.SetText("")
 			getAIResponse(s, chatLog)
 
@@ -98,23 +97,10 @@ func NewChatApp() *ChatApp {
 		if text != "" {
 			messagegrid.Add(NewUserMessageElement(text))
 
-			//chatLog.SetText(chatLog.Text + "You: " + text + "\n")
 			input.SetText("")
 			getAIResponse(text, chatLog)
 
 		}
-	})
-	ChangeModelBtn := widget.NewButton("Providers", func() {
-		ModelMenuModal(w, &ChatApp{a, w, input, chatLog})
-	})
-	ClearBtn := widget.NewButton("Clear", func() {
-		chatLog.SetText("")
-	})
-	ExitBtn := widget.NewButton("Exit", func() {
-		a.Quit()
-	})
-	SettingsBtn := widget.NewButton("Settings", func() {
-		showSettingsModal(w, &ChatApp{a, w, input, chatLog})
 	})
 	MContainer := container.NewBorder(
 		nil,
@@ -124,27 +110,79 @@ func NewChatApp() *ChatApp {
 		chatLog,
 	)
 	MContainer.Resize(fyne.NewSize(900, 600))
+	toolbar := widget.NewToolbar(
+		widget.NewToolbarAction(icns.Icons8("256", "trash--v1.png", ""), func() {
+			chatLog.SetText("")
+			messagegrid.Objects = nil
+		}),
+		widget.NewToolbarSeparator(),
+		widget.NewToolbarAction(icns.Icons8("256", "source-code.png", ""), func() {
+			CodeModal(w, &ChatApp{a, w, input, chatLog})
+		}),
+		widget.NewToolbarAction(icns.Icons8("256", "copy--v1.png", ""), func() {
+			//TexttoCopy := strings.Split(chatLog.Text, "Merlin:")[len(strings.Split(chatLog.Text, "Merlin: "))-1]
+			clipboard.Write(clipboard.FmtText, []byte(chatLog.Text))
+		}),
+		widget.NewToolbarAction(icns.Icons8("256", "chatgpt.png", "nolan"), func() {
+			ModelMenuModal(w, &ChatApp{a, w, input, chatLog})
+		}),
+		widget.NewToolbarSpacer(),
+		widget.NewToolbarAction(icns.Icons8("256", "help--v1.png", ""), func() {
+			log.Println("Display help")
+		}),
+		widget.NewToolbarAction(icns.Icons8("256", "services--v1.png", ""), func() {
+			showSettingsModal(w, &ChatApp{a, w, input, chatLog})
+		}),
+		widget.NewToolbarAction(icns.Icons8("256", "shutdown--v1.png", ""), func() {
+			w.Close()
+		}),
+	)
+	toolbar.Resize(fyne.NewSize(900, 100))
+	SendBtn.SetIcon(icns.Icons8("256", "sent--v2.png", ""))
 	Container_ := container.NewBorder(
-		nil,
+		toolbar,
 		container.NewGridWithColumns(2, input, SendBtn),
 		nil,
-		container.NewGridWithRows(10, ExitBtn, ClearBtn, SettingsBtn, ChangeModelBtn),
+		nil,
 		MContainer,
-		// container.NewAdaptiveGrid(1, chatLog),
 	)
-	//menu := container.NewGridWithColumns(2, ExitBtn, ClearBtn)
-	//cont := container.NewBorder(menu, container.NewGridWithColumns(2, input, SendBtn), nil, nil, Container_)
 	w.SetContent(Container_)
 
 	return &ChatApp{a, w, input, chatLog}
 }
 
-// *****************************************************
-// Fix this layout bs
+func CodeModal(w fyne.Window, app *ChatApp) {
+	richcodemd := widget.NewRichTextFromMarkdown(app.chatLog.Text)
+	richcodemd.Resize(fyne.NewSize(800, 550))
+	scroll := container.NewVScroll(richcodemd)
+	scroll.SetMinSize(fyne.NewSize(700, 600))
+	copybtn := widget.NewButton("Copy", func() {
+		clipboard.Write(clipboard.FmtText, []byte(app.chatLog.Text))
+	})
+	copybtn.SetIcon(icns.Icons8("256", "copy--v1.png", ""))
+	OKBtn := widget.NewButton("OK", nil)
+	OKBtn.SetIcon(icns.Icons8("256", "checkmark.png", ""))
+	notification := container.NewVBox(
+		scroll,
+		container.NewHBox(
+			layout.NewSpacer(),
+			copybtn,
+			OKBtn,
+			layout.NewSpacer(),
+		),
+	)
+	popup := widget.NewModalPopUp(notification, w.Canvas())
+	// OKBtn := popup.Content.(*fyne.Container).Objects[len(popup.Content.(*fyne.Container).Objects)-1].(*widget.Button)
+	OKBtn.OnTapped = func() {
+		popup.Hide()
+	}
+
+	popup.Resize(fyne.NewSize(900, 600))
+	popup.Show()
+}
+
 func NewUserMessageElement(message string) *widget.RichText {
 	userMessage := widget.NewRichTextFromMarkdown(fmt.Sprintf("**You:** %s", message))
-	// userMessage.TextStyle.Bold = true
-	// userMessage.Alignment = fyne.TextAlignTrailing
 	userMessage.Wrapping = fyne.TextWrapWord
 
 	return userMessage
@@ -164,7 +202,6 @@ func getAIResponse(input string, chatlog *widget.Entry) string {
 		handler.HuggingFaceAI(input, CurrentHugModel, chatlog)
 	}
 	if CurrentAIProvider == "black-box" {
-		// Implement Black Box AI logic here
 		handler.BlackBoxAI(input, chatlog)
 	}
 	if CurrentAIProvider == "tune-app" {
@@ -173,16 +210,12 @@ func getAIResponse(input string, chatlog *widget.Entry) string {
 	if CurrentAIProvider == "youai" {
 		handler.YouAI(input, chatlog)
 	}
-	chatlog.SetText(chatlog.Text + "=======================================================================================\n")
-	// TO DO: implement AI logic here
-	// for now, just return a simple response
 	return "I'm not sure I understand. Can you please rephrase?"
 }
 func showSettingsModal(w fyne.Window, a *ChatApp) {
 	if setterr != nil {
 		log.Println("Error loading settings:", setterr)
 	}
-	// Create a settings modal
 	settings := container.NewVBox(
 		widget.NewLabel("Settings"),
 		widget.NewTextGridFromString("TuneAPP Model:"),
@@ -211,11 +244,14 @@ func showSettingsModal(w fyne.Window, a *ChatApp) {
 		widget.NewEntry(),
 		widget.NewCheck(("Dark Mode"), nil),
 		widget.NewButton("Save", nil),
-	) // Len 6
+	)
 
 	popup := widget.NewModalPopUp(settings, w.Canvas())
 	popup.Resize(fyne.NewSize(400, 300))
 	SaveBtn := popup.Content.(*fyne.Container).Objects[len(popup.Content.(*fyne.Container).Objects)-1].(*widget.Button)
+	title := popup.Content.(*fyne.Container).Objects[0].(*widget.Label)
+	title.TextStyle.Bold = true
+	title.Alignment = fyne.TextAlignCenter
 
 	DarkMode := popup.Content.(*fyne.Container).Objects[len(popup.Content.(*fyne.Container).Objects)-2].(*widget.Check)
 	DarkMode.OnChanged = func(b bool) {
@@ -261,6 +297,7 @@ func showSettingsModal(w fyne.Window, a *ChatApp) {
 	CurrentHugModel_Dropdown.Selected = CurrentHugModel
 	CurrentTuneModel_Dropdown := popup.Content.(*fyne.Container).Objects[len(popup.Content.(*fyne.Container).Objects)-21].(*widget.Select)
 	CurrentTuneModel_Dropdown.Selected = CurrentTuneAppModel
+	SaveBtn.SetIcon(icns.Icons8("256", "save--v1.png", ""))
 	SaveBtn.OnTapped = func() {
 		updatedSettings := misc.Data{
 			CurrentTuneModel:   CurrentTuneModel_Dropdown.Selected,
@@ -303,13 +340,21 @@ func showSettingsModal(w fyne.Window, a *ChatApp) {
 	popup.Show()
 }
 func NotificationModal(w fyne.Window, a *ChatApp, title string, message string) {
-	notification := container.NewVBox(
-		widget.NewLabel(title),
-		widget.NewLabel(message),
-		widget.NewButton("OK", nil),
+	title_element := widget.NewRichTextFromMarkdown(fmt.Sprintf("# %s", title))
+
+	notification := container.NewBorder(
+		title_element,
+		container.NewVBox(
+			widget.NewRichTextFromMarkdown(fmt.Sprintf("##  %s", message)),
+			widget.NewButton("OK", nil),
+		),
+		nil,
+		nil,
 	)
 	popup := widget.NewModalPopUp(notification, w.Canvas())
-	OKBtn := popup.Content.(*fyne.Container).Objects[len(popup.Content.(*fyne.Container).Objects)-1].(*widget.Button)
+	popup.CreateRenderer().Layout(notification.Size())
+	OKBtn := notification.Objects[1].(*fyne.Container).Objects[1].(*widget.Button)
+	OKBtn.SetIcon(icns.Icons8("256", "checkmark--v1.png", ""))
 	OKBtn.OnTapped = func() {
 		popup.Hide()
 	}
@@ -318,7 +363,6 @@ func NotificationModal(w fyne.Window, a *ChatApp, title string, message string) 
 }
 
 func ModelMenuModal(w fyne.Window, a *ChatApp) {
-	// Create a model selection modal
 	modelMenu := container.NewVBox(
 		widget.NewLabel("Select Model Provider"),
 		widget.NewButton("Merlin", func() {
@@ -342,16 +386,12 @@ func ModelMenuModal(w fyne.Window, a *ChatApp) {
 		widget.NewButton("YouAI", func() {
 			CurrentAIProvider = "youai"
 		}),
-		// widget.NewButton("Cancel", func() {
-		// 	CurrentAIProvider = CurrentAIProvider
-		// }),
 	)
 
 	popup := widget.NewModalPopUp(modelMenu, w.Canvas())
 	popup.Resize(fyne.NewSize(300, 200))
 	Providers := []string{"merlin", "bing", "hugging-face", "black-box", "tune-app", "youai"}
 	for i, btn := range popup.Content.(*fyne.Container).Objects {
-		// skip the first label and add an OnTapped handler to each button
 		if _, ok := btn.(*widget.Label); !ok {
 			btn.(*widget.Button).OnTapped = func() {
 				CurrentAIProvider = Providers[i-1]

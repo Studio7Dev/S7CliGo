@@ -4,12 +4,18 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
 	"io/ioutil"
+	"log"
+	"net/http"
 	"os"
 	"path/filepath"
 	"runtime"
 	"strings"
 	"sync"
+
+	"fyne.io/fyne/v2"
+	"fyne.io/fyne/v2/theme"
 )
 
 type Funcs struct {
@@ -124,4 +130,61 @@ func (cu CookieUtil) ParseCookiesFromString(cookiesStr string) map[string]string
 		cookies[parts[0]] = strings.Join(parts[1:], "=")
 	}
 	return cookies
+}
+
+type IconUtil struct{}
+
+func (iu IconUtil) IconFromBytes(IconName string, IconBytes []byte) fyne.Resource {
+	return fyne.NewStaticResource(IconName, IconBytes)
+}
+
+func (iu IconUtil) IconFromRepo(name string) fyne.Resource {
+	IconsRepoBaseUrl := "https://raw.githubusercontent.com/ZachC137/MICNS/e2b386038b1465856a3f46735a384b80d5511655/"
+	// http get request to the repo to get the icon
+	resp, err := http.Get(IconsRepoBaseUrl + name + ".png")
+	if err != nil {
+		log.Fatalf("Failed to fetch icon: %v", err)
+	}
+	IconBytes, err := io.ReadAll(resp.Body)
+	if err != nil {
+		log.Fatalf("Failed to read icon response body: %v", err)
+	}
+	return fyne.NewStaticResource(name, IconBytes)
+}
+
+func (iu IconUtil) IconByteLoader(IconName string, IconsFolder string) []byte {
+	if IconsFolder == "" {
+		IconsFolder = "assets/"
+	}
+	IconBytes, err := ioutil.ReadFile(IconsFolder + IconName + ".png")
+	if err != nil {
+		log.Fatalf("Failed to load icon: %v", err)
+	}
+	return IconBytes
+}
+
+func (iu IconUtil) Icon(name fyne.ThemeIconName) fyne.Resource {
+	if name == "appicon" {
+
+		return fyne.NewStaticResource("appicon", iu.IconByteLoader("appicon", ""))
+	} else {
+		return theme.DefaultTheme().Icon(name)
+	}
+
+}
+
+func (iu IconUtil) Icons8(uuid string, name string, category string) fyne.Resource {
+	if category == "" {
+		category = "color"
+	}
+	BaseUrl := fmt.Sprintf("https://img.icons8.com/%s/%s/%s", category, uuid, name)
+	resp, err := http.Get(BaseUrl)
+	if err != nil {
+		log.Fatalf("Failed to fetch icon: %v", err)
+	}
+	IconBytes, err := io.ReadAll(resp.Body)
+	if err != nil {
+		log.Fatalf("Failed to read icon response body: %v", err)
+	}
+	return fyne.NewStaticResource(name, IconBytes)
 }
