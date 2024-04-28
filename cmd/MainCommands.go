@@ -933,35 +933,22 @@ func (m *MC) Init(h cmds_.Handler) cmds_.Handler {
 				if message == "exit" {
 					break
 				}
-				if message == "" {
-					continue
-				}
-				if message == "chatid" {
-					tunehandler.Handle(message)
-					continue
-				}
-				if message == "del-all" {
-					tunehandler.Handle(message)
-					continue
-				}
-				if message == "list-convos" {
-					tunehandler.Handle(message)
-					continue
-				}
-				if message == "change-convo" {
-					tunehandler.Handle(message)
-					continue
-				}
 				if message == "clear" {
 					h.Handle(message)
 					continue
 
 				}
-				if message == "new-convo" {
-					tunehandler.Handle(message)
+				if message == "" {
 					continue
+				}
+				valid_commands := []string{"chatid", "list-convos", "del-all", "change-convo", "new-convo"}
+				if f_.LContains(message, valid_commands) {
+					tunehandler.Handle(message)
 				} else {
-					tuneclient.SendMessage(message, chat_id, "rohan/mixtral-8x7b-inst-v0-1-32k", false, false)
+					_, err := tuneclient.SendMessage(message, chat_id, "rohan/mixtral-8x7b-inst-v0-1-32k", true, false)
+					if err != nil {
+						fmt.Println("Error sending message:", err)
+					}
 					fmt.Println()
 				}
 
