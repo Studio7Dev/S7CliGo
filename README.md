@@ -15,6 +15,8 @@ Features
 * TMDB (The Movie Database) integration
 * Bing AI integration
 * AI text to image
+* TuneAPP AI Chat
+* YouAI
 
 Getting Started
 ---------------
@@ -38,6 +40,7 @@ Commands
 | `youai` | Interact with `you.com` AI (YouAI) |
 | `img-gen` | Generate images from text prompts, using AI |
 | `goliath` | Interact with Goliath AI from `https://studio.tune.app/` |
+| `tuneai` | Interact with AI models provided by `tune.app` |
 | `enable-tcp` | Enable TCP API Usage |
 | `enable-http`| Enable Web API Usage |
 #### Available Models for HuggingFace
