@@ -5,6 +5,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"guiv1/models/tuneapp"
 	"io"
 	"log"
 	"net/http"
@@ -24,7 +25,12 @@ func NewMerlin(authToken, chatID string) *Merlin {
 	}
 }
 
+var ActiveThreadSnippet []interface{}
+var OldMerlinMsg = ""
+
 func (m *Merlin) Chat(message string) (io.Reader, error) {
+	OldMerlinMsg = message
+	fmt.Println("ChatID:", m.ChatID)
 	data := map[string]interface{}{
 		"action": map[string]interface{}{
 			"message": map[string]interface{}{
@@ -38,7 +44,7 @@ func (m *Merlin) Chat(message string) (io.Reader, error) {
 			},
 			"type": "NEW",
 		},
-		"activeThreadSnippet": []interface{}{},
+		"activeThreadSnippet": ActiveThreadSnippet,
 		"chatId":              m.ChatID,
 		"language":            "AUTO",
 		"metadata":            nil,
@@ -77,6 +83,9 @@ func (m *Merlin) RawStream(message string) (http.Response, error) {
 
 func (m *Merlin) StreamContent(responseBody io.Reader) error {
 	scanner := bufio.NewScanner(responseBody)
+	allfullcontent := ""
+	UserSnippet := make([]interface{}, 0)
+	AISnippet := make([]interface{}, 0)
 	for scanner.Scan() {
 		line := scanner.Text()
 		if line == "" {
@@ -105,10 +114,42 @@ func (m *Merlin) StreamContent(responseBody io.Reader) error {
 			log.Println("Error: content field not found in event data")
 			continue
 		}
-
+		allfullcontent += content
 		fmt.Print(content)
 	}
-
+	parentid := tuneapp.TuneClient{}.NewUuid()
+	UserSnippet = append(UserSnippet, map[string]interface{}{
+		"attachments": []interface{}{},
+		"content":     OldMerlinMsg,
+		"id":          parentid,
+		"metadata": []interface{}{
+			map[string]interface{}{
+				"key":   "context",
+				"value": "This is the context for the user message.",
+			},
+		},
+		"parentId":       "root",
+		"role":           "user",
+		"status":         "SUCCESS",
+		"activeChildIdx": 0,
+		"totalChildren":  1,
+		"idx":            0,
+		"totSiblings":    1,
+	})
+	ai_id := tuneapp.TuneClient{}.NewUuid()
+	AISnippet = append(AISnippet, map[string]interface{}{
+		"content":        allfullcontent,
+		"id":             ai_id,
+		"parentId":       parentid,
+		"role":           "assistant",
+		"status":         "SUCCESS",
+		"activeChildIdx": 0,
+		"totalChildren":  0,
+		"idx":            0,
+		"totSiblings":    1,
+	})
+	ActiveThreadSnippet = append(ActiveThreadSnippet, &UserSnippet)
+	ActiveThreadSnippet = append(ActiveThreadSnippet, &AISnippet)
 	if err := scanner.Err(); err != nil {
 		return err
 	}

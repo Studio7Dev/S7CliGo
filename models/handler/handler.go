@@ -197,6 +197,8 @@ func BingAI(message string, chatlog *widget.Entry) error {
 	return nil
 }
 
+var chatID = tuneapp.TuneClient{}.NewUuid()
+
 func MerlinAI_(message string, chatlog *widget.Entry) error {
 	settingsFile, err := os.Open("settings.json")
 	if err != nil {
@@ -218,7 +220,7 @@ func MerlinAI_(message string, chatlog *widget.Entry) error {
 	}
 
 	authToken := result.MerlinAuthToken
-	chatID := "43ac5495-e1e1-4a68-9115-" + "x"
+
 	m := merlin.NewMerlin(authToken, chatID)
 
 	responseBody, err := m.Chat(message)
@@ -226,7 +228,11 @@ func MerlinAI_(message string, chatlog *widget.Entry) error {
 		return err
 	}
 	scanner := bufio.NewScanner(responseBody)
+	allfullcontent := ""
+	UserSnippet := make([]interface{}, 0)
+	AISnippet := make([]interface{}, 0)
 	chatlog.SetText(chatlog.Text + "Merlin: " + "" + "\n ")
+
 	//chatlog.SetText(chatlog.Text + "=======================================================================================\n")
 	for scanner.Scan() {
 		line := scanner.Text()
@@ -260,6 +266,7 @@ func MerlinAI_(message string, chatlog *widget.Entry) error {
 			log.Println("Error reading response body:", scanner.Err())
 
 		}
+		allfullcontent += content
 		chatlog.SetText(chatlog.Text + content)
 		chatlog.Wrapping = fyne.TextWrapWord
 
@@ -267,6 +274,39 @@ func MerlinAI_(message string, chatlog *widget.Entry) error {
 		// w.Write([]byte(content))
 		// w.(http.Flusher).Flush()
 	}
+	parentid := tuneapp.TuneClient{}.NewUuid()
+	UserSnippet = append(UserSnippet, map[string]interface{}{
+		"attachments": []interface{}{},
+		"content":     merlin.OldMerlinMsg,
+		"id":          parentid,
+		"metadata": []interface{}{
+			map[string]interface{}{
+				"key":   "context",
+				"value": "This is the context for the user message.",
+			},
+		},
+		"parentId":       "root",
+		"role":           "user",
+		"status":         "SUCCESS",
+		"activeChildIdx": 0,
+		"totalChildren":  1,
+		"idx":            0,
+		"totSiblings":    1,
+	})
+	ai_id := tuneapp.TuneClient{}.NewUuid()
+	AISnippet = append(AISnippet, map[string]interface{}{
+		"content":        allfullcontent,
+		"id":             ai_id,
+		"parentId":       parentid,
+		"role":           "assistant",
+		"status":         "SUCCESS",
+		"activeChildIdx": 0,
+		"totalChildren":  0,
+		"idx":            0,
+		"totSiblings":    1,
+	})
+	merlin.ActiveThreadSnippet = append(merlin.ActiveThreadSnippet, &UserSnippet)
+	merlin.ActiveThreadSnippet = append(merlin.ActiveThreadSnippet, &AISnippet)
 	chatlog.SetText(chatlog.Text + "\n")
 	// w.Write([]byte("\n[DONE]"))
 	// w.(http.Flusher).Flush()

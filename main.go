@@ -44,7 +44,7 @@ func NewChatApp() *ChatApp {
 	a := app.New()
 
 	w := a.NewWindow("S7 Gui V1")
-	w.Resize(fyne.NewSize(1025, 800))
+	w.Resize(fyne.NewSize(1200, 800))
 	w.SetFixedSize(true)
 	w.CenterOnScreen()
 	w.SetIcon(icns.Icon("appicon"))
