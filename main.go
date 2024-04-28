@@ -70,6 +70,7 @@ func NewChatApp() *ChatApp {
 	scroll := container.NewVScroll(messagegrid)
 	scroll.SetMinSize(fyne.NewSize(150, 700))
 	scroll.Direction = container.ScrollBoth
+
 	chatLog.OnChanged = func(s string) {
 		chatLog.CursorRow = len(chatLog.Text) - 1
 		scroll.ScrollToBottom()
@@ -137,6 +138,7 @@ func NewChatApp() *ChatApp {
 			w.Close()
 		}),
 	)
+	// add tooltips to toolbar actions
 	toolbar.Resize(fyne.NewSize(900, 100))
 	SendBtn.SetIcon(icns.Icons8("256", "sent--v2.png", ""))
 	Container_ := container.NewBorder(
@@ -363,36 +365,67 @@ func NotificationModal(w fyne.Window, a *ChatApp, title string, message string) 
 }
 
 func ModelMenuModal(w fyne.Window, a *ChatApp) {
+	merlin_btn := widget.NewButton("Merlin", func() {
+		CurrentAIProvider = "merlin"
+
+	})
+	merlin_btn.SetIcon(icns.Icon("merlin"))
+	bing_btn := widget.NewButton("Bing", func() {
+		CurrentAIProvider = "bing"
+
+	})
+	bing_btn.SetIcon(icns.Icons8("90", "bing--v1.png", "fluency"))
+	hugging_face_btn := widget.NewButton("Hugging Face", func() {
+		CurrentAIProvider = "hugging-face"
+	})
+	hugging_face_btn.SetIcon(icns.Icon("huggingface"))
+	blackbox_btn := widget.NewButton("Black Box", func() {
+		CurrentAIProvider = "black-box"
+	})
+	blackbox_btn.SetIcon(icns.Icon("blackbox"))
+	tuneapp_btn := widget.NewButton("Tune App", func() {
+		CurrentAIProvider = "tune-app"
+	})
+	tuneapp_btn.SetIcon(icns.Icon("tuneapp"))
+	youai_btn := widget.NewButton("YouAI", func() {
+		CurrentAIProvider = "youai"
+	})
+	youai_btn.SetIcon(icns.Icon("youai"))
+	title_ := widget.NewRichTextFromMarkdown("# Select AI Provider: ")
 	modelMenu := container.NewVBox(
-		widget.NewLabel("Select Model Provider"),
-		widget.NewButton("Merlin", func() {
-			CurrentAIProvider = "merlin"
-
-		}),
-		widget.NewButton("Bing", func() {
-			CurrentAIProvider = "bing"
-
-		}),
-		widget.NewButton("Hugging Face", func() {
-			CurrentAIProvider = "hugging-face"
-
-		}),
-		widget.NewButton("Black Box", func() {
-			CurrentAIProvider = "black-box"
-		}),
-		widget.NewButton("Tune App", func() {
-			CurrentAIProvider = "tune-app"
-		}),
-		widget.NewButton("YouAI", func() {
-			CurrentAIProvider = "youai"
-		}),
+		container.NewHBox(
+			title_,
+			widget.NewSeparator(),
+			widget.NewToolbar(
+				widget.NewToolbarSpacer(),
+				widget.NewToolbarSpacer(),
+				widget.NewToolbarSpacer(),
+				widget.NewToolbarAction(icns.Icons8("256", "cancel--v1.png", ""), nil),
+			),
+		),
+		merlin_btn,
+		bing_btn,
+		hugging_face_btn,
+		blackbox_btn,
+		tuneapp_btn,
+		youai_btn,
 	)
 
 	popup := widget.NewModalPopUp(modelMenu, w.Canvas())
 	popup.Resize(fyne.NewSize(300, 200))
+	toolbar_ := popup.Content.(*fyne.Container).Objects[0].(*fyne.Container).Objects[2].(*widget.Toolbar)
+	toolbar_.Resize(fyne.NewSize(300, 100))
+	toolbar_.Refresh()
+	cancelbtn := popup.Content.(*fyne.Container).Objects[0].(*fyne.Container).Objects[2].(*widget.Toolbar).Items[3].(*widget.ToolbarAction)
+	cancelbtn.OnActivated = func() {
+		popup.Hide()
+	}
+	cancelbtn.SetIcon(icns.Icons8("256", "cancel--v1.png", ""))
+	cancelbtn.ToolbarObject().Resize(fyne.NewSize(100, 100))
+	cancelbtn.ToolbarObject().Refresh()
 	Providers := []string{"merlin", "bing", "hugging-face", "black-box", "tune-app", "youai"}
 	for i, btn := range popup.Content.(*fyne.Container).Objects {
-		if _, ok := btn.(*widget.Label); !ok {
+		if _, ok := btn.(*fyne.Container); !ok {
 			btn.(*widget.Button).OnTapped = func() {
 				CurrentAIProvider = Providers[i-1]
 				popup.Hide()

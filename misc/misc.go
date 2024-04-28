@@ -15,7 +15,6 @@ import (
 	"sync"
 
 	"fyne.io/fyne/v2"
-	"fyne.io/fyne/v2/theme"
 )
 
 type Funcs struct {
@@ -163,14 +162,8 @@ func (iu IconUtil) IconByteLoader(IconName string, IconsFolder string) []byte {
 	return IconBytes
 }
 
-func (iu IconUtil) Icon(name fyne.ThemeIconName) fyne.Resource {
-	if name == "appicon" {
-
-		return fyne.NewStaticResource("appicon", iu.IconByteLoader("appicon", ""))
-	} else {
-		return theme.DefaultTheme().Icon(name)
-	}
-
+func (iu IconUtil) Icon(name string) fyne.Resource {
+	return fyne.NewStaticResource(name, iu.IconByteLoader(name, ""))
 }
 
 func (iu IconUtil) Icons8(uuid string, name string, category string) fyne.Resource {

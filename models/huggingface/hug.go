@@ -46,7 +46,9 @@ func (s *ChatClient) FindRandomUUID(text string) string {
 
 	if len(uuids) > 0 {
 		rand.Seed(time.Now().UnixNano())
-		return uuids[rand.Intn(len(uuids))]
+		// find the last uuid in the list
+		return uuids[len(uuids)-1]
+		//return uuids[rand.Intn(len(uuids))]
 	}
 
 	return ""
@@ -120,6 +122,7 @@ func (s *ChatClient) ChangeModel(model string) string {
 }
 
 func (c *ChatClient) SendMessage(message string, convId string, Id string, raw bool) (error, http.Response) {
+	fmt.Println(message, convId, Id)
 	data := strings.NewReader(fmt.Sprintf(`{"inputs":"%s","id":"%s","is_retry":false,"is_continue":false,"web_search":false,"files":[]}`, message, Id))
 	req, err := http.NewRequest("POST", "https://huggingface.co/chat/conversation/"+convId, data)
 	if err != nil {

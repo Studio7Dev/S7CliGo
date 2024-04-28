@@ -87,12 +87,18 @@ func (c TuneClient) NewChat(model_name string) string {
 	return chat_id
 }
 
-func (c TuneClient) SendMessage(message string, chat_id string, model string, internet bool, raw bool) (http.Response, error) {
+func (c TuneClient) SendMessage(message string, chat_id string, model string, internet bool, raw bool, PrevMsgId string, UsrPrevMsgid string) (http.Response, error) {
 	if AccessToken == "" {
 		AccessToken = AccessToken_New
 	}
+	if PrevMsgId == "" {
+		PrevMsgId = c.NewUuid()
+	}
+	if UsrPrevMsgid == "" {
+		UsrPrevMsgid = c.NewUuid()
+	}
 	client := &http.Client{}
-	var data = strings.NewReader(`{"query":"` + message + `","conversation_id":"` + chat_id + `","model_id":"` + model + `","browseWeb":` + strconv.FormatBool(internet) + `,"attachement":"","attachment_name":"","messageId":"` + c.NewUuid() + `","prevMessageId":"` + c.NewUuid() + `"}`)
+	var data = strings.NewReader(`{"query":"` + message + `","conversation_id":"` + chat_id + `","model_id":"` + model + `","browseWeb":` + strconv.FormatBool(internet) + `,"attachement":"","attachment_name":"","messageId":"` + c.NewUuid() + `","prevMessageId":"` + PrevMsgId + `"}`)
 	req, err := http.NewRequest("POST", "https://chat.tune.app/api/prompt", data)
 	if err != nil {
 		log.Fatal(err)
@@ -135,6 +141,11 @@ func (c TuneClient) SendMessage(message string, chat_id string, model string, in
 			json.Unmarshal(line, &response)
 			if err != nil {
 				fmt.Println("Error decoding JSON response:", err)
+			}
+			PrevMsgId_ := response["assistantMessageId"]
+			if PrevMsgId_ != nil {
+				PrevMsgId = PrevMsgId_.(string)
+				fmt.Println("Previous message ID:", PrevMsgId)
 			}
 			value_ := response["value"]
 			if value_ != nil {

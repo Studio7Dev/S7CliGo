@@ -24,6 +24,10 @@ import (
 var (
 	f_               = misc.Funcs{}
 	AppSettings, err = f_.LoadSettings()
+	BlackBox_        = blackbox.NewBlackboxClient()
+	tuneclient       = tuneapp.TuneClient{}
+	c, errx          = tuneclient.GetConversations()
+	tune_chat_id     = c[0]["conversation_id"].(string)
 )
 
 func YouAI(message string, chatlog *widget.Entry) error {
@@ -72,9 +76,12 @@ func YouAI(message string, chatlog *widget.Entry) error {
 	return nil
 }
 
+var PrevMsgId = ""
+var UsrPrevId = ""
+
 func TuneAppAI(message string, model_ string, chatlog *widget.Entry) error {
 	message_content := message
-	tuneclient := tuneapp.TuneClient{}
+
 	settings_, err := f_.LoadSettings()
 	if err != nil {
 		log.Fatalf("Error loading settings: %v", err)
@@ -82,12 +89,12 @@ func TuneAppAI(message string, model_ string, chatlog *widget.Entry) error {
 	if settings_.TuneAppAccessToken == "" {
 		tuneclient.NewChat(tuneclient.GetModels()[0])
 	}
-	c, err := tuneclient.GetConversations()
+
 	if err != nil {
 		log.Fatalf("Error getting conversations: %v", err)
 	}
-	chat_id := c[0]["conversation_id"].(string)
-	resp, err := tuneclient.SendMessage(message_content, chat_id, model_, false, true)
+
+	resp, err := tuneclient.SendMessage(message_content, tune_chat_id, model_, false, true, PrevMsgId, UsrPrevId)
 	if err != nil {
 		log.Fatalf("Error sending message: %v", err)
 	}
@@ -111,6 +118,14 @@ func TuneAppAI(message string, model_ string, chatlog *widget.Entry) error {
 		if err != nil {
 			fmt.Println("Error decoding JSON response:", err)
 		}
+		PrevMsgId_ := response["assistantMessageId"]
+		UsrPrevId_ := response["userMessageId"]
+		if PrevMsgId_ != nil {
+			PrevMsgId = PrevMsgId_.(string)
+			UsrPrevId = UsrPrevId_.(string)
+			fmt.Println("Previous user message ID:", UsrPrevId)
+			fmt.Println("Previous message ID:", PrevMsgId)
+		}
 		value_ := response["value"]
 		if value_ != nil {
 			chatlog.SetText(chatlog.Text + value_.(string))
@@ -126,7 +141,7 @@ func TuneAppAI(message string, model_ string, chatlog *widget.Entry) error {
 
 func BlackBoxAI(message string, chatlog *widget.Entry) error {
 	message_content := message
-	BlackBox_ := blackbox.NewBlackboxClient()
+
 	reply := BlackBox_.SendMessage(message_content, true)
 	chatlog.SetText(chatlog.Text + "BlackBox: " + "" + "\n ")
 	//chatlog.SetText(chatlog.Text + "=======================================================================================\n")
@@ -261,15 +276,18 @@ func MerlinAI_(message string, chatlog *widget.Entry) error {
 	return nil
 }
 
+var client = huggingface.NewHug()
+var ChatCurrId = ""
+
 func HuggingFaceAI(message string, model_ string, chatlog *widget.Entry) error {
 
 	message_content := message
 
-	client := huggingface.NewHug()
-
-	ChatId := client.ChangeModel(model_)
-	Id_ := client.GetMsgUID(ChatId)
-	err, r := client.SendMessage(message_content, ChatId, Id_, true)
+	if ChatCurrId == "" {
+		ChatCurrId = client.ChangeModel(model_)
+	}
+	Id_ := client.GetMsgUID(ChatCurrId)
+	err, r := client.SendMessage(message_content, ChatCurrId, Id_, true)
 	if err != nil && r.Body == nil {
 		return err
 	}

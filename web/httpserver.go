@@ -396,7 +396,7 @@ func TuneAIChat(w http.ResponseWriter, r *http.Request) {
 			log.Fatalf("Error getting conversations: %v", err)
 		}
 		chat_id := c[0]["conversation_id"].(string)
-		resp, err := tuneclient.SendMessage(message_content, chat_id, "rohan/mixtral-8x7b-inst-v0-1-32k", false, true)
+		resp, err := tuneclient.SendMessage(message_content, chat_id, "rohan/mixtral-8x7b-inst-v0-1-32k", false, true, "", "")
 		reader := bufio.NewReader(resp.Body)
 		for {
 			line, err := reader.ReadBytes('\n')
