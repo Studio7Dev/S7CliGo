@@ -16,7 +16,7 @@ Features
 * Bing AI integration
 * AI text to image
 * TuneAPP AI Chat
-* YouAI
+* YouAI Chat
 
 Getting Started
 ---------------
