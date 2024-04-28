@@ -48,7 +48,7 @@ func NewChatApp() *ChatApp {
 	w.SetFixedSize(true)
 	w.CenterOnScreen()
 	w.SetIcon(icns.Icon("appicon"))
-
+	w.SetTitle(fmt.Sprintf("S7 Gui V1 - Current AI Provider: %s", CurrentAIProvider))
 	if AppSettings.DarkMode {
 		a.Settings().SetTheme(theme.DarkTheme())
 	} else {
@@ -89,7 +89,7 @@ func NewChatApp() *ChatApp {
 			messagegrid.Add(NewUserMessageElement(s))
 
 			input.SetText("")
-			getAIResponse(s, chatLog)
+			getAIResponse(s, chatLog, w)
 
 		}
 	}
@@ -99,7 +99,7 @@ func NewChatApp() *ChatApp {
 			messagegrid.Add(NewUserMessageElement(text))
 
 			input.SetText("")
-			getAIResponse(text, chatLog)
+			getAIResponse(text, chatLog, w)
 
 		}
 	})
@@ -190,9 +190,9 @@ func NewUserMessageElement(message string) *widget.RichText {
 	return userMessage
 }
 
-func getAIResponse(input string, chatlog *widget.Entry) string {
+func getAIResponse(input string, chatlog *widget.Entry, w fyne.Window) string {
 	fmt.Println("Current model:", CurrentAIProvider)
-
+	w.SetTitle(fmt.Sprintf("S7 Gui V1 - Current AI Provider: %s | > %s", CurrentAIProvider, input))
 	if CurrentAIProvider == "merlin" {
 		handler.MerlinAI_(input, chatlog)
 	}
@@ -296,8 +296,15 @@ func showSettingsModal(w fyne.Window, a *ChatApp) {
 		AppSettings.BingHost = s
 	}
 	CurrentHugModel_Dropdown := popup.Content.(*fyne.Container).Objects[len(popup.Content.(*fyne.Container).Objects)-19].(*widget.Select)
+	CurrentHugModel_Dropdown.OnChanged = func(model string) {
+		handler.ChatCurrId = ""
+		CurrentHugModel = model
+	}
 	CurrentHugModel_Dropdown.Selected = CurrentHugModel
 	CurrentTuneModel_Dropdown := popup.Content.(*fyne.Container).Objects[len(popup.Content.(*fyne.Container).Objects)-21].(*widget.Select)
+	CurrentTuneModel_Dropdown.OnChanged = func(model string) {
+		CurrentTuneAppModel = model
+	}
 	CurrentTuneModel_Dropdown.Selected = CurrentTuneAppModel
 	SaveBtn.SetIcon(icns.Icons8("256", "save--v1.png", ""))
 	SaveBtn.OnTapped = func() {
@@ -428,6 +435,7 @@ func ModelMenuModal(w fyne.Window, a *ChatApp) {
 		if _, ok := btn.(*fyne.Container); !ok {
 			btn.(*widget.Button).OnTapped = func() {
 				CurrentAIProvider = Providers[i-1]
+				w.SetTitle(fmt.Sprintf("S7 Gui V1 - Current AI Provider: %s", CurrentAIProvider))
 				popup.Hide()
 
 			}
