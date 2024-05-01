@@ -135,6 +135,7 @@ func NewChatApp() *ChatApp {
 	})
 	httpserverStopBtn := widget.NewToolbarAction(icns.Icons8("256", "stop.png", "fluency"), func() {
 		if stop_ == 0 {
+			f_.NotificationModal(w, &misc.ChatApp{a, w, input, chatLog}, "HTTP Server Error", "The HTTP server is not running "+AppSettings.Httphost)
 			return
 		}
 		// <-httpserver.ProcStop
