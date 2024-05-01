@@ -45,6 +45,43 @@ To select an AI model, use the "Select AI Provider" button in the top-right corn
 
 To save settings, use the "Save" button in the settings modal. To load settings, use the "Load" button in the settings modal.
 
+### Merlin
+#### Linux
+```curl
+curl -N -X POST -H "Content-Type: application/json" --data '{"message":"hi"}' http://localhost:8080/merlin
+```
+#### Windows
+```curl
+curl -N -X POST -H "Content-Type: application/json" --data "{\"message\":\"hi\"}" http://localhost:8080/merlin
+```
+### HuggingFace
+#### Linux
+```curl
+curl -N -X POST -H "Content-Type: application/json" --data '{"message":"hi how are you", "model":"mistralai/Mistral-7B-Instruct-v0.2"}' http://localhost:8080/hug
+```
+#### Windows
+```curl
+curl -N -X POST -H "Content-Type: application/json" --data "{\"message\":\"hi how are you\", \"model\":\"mistralai/Mistral-7B-Instruct-v0.2\"}" http://localhost:8080/hug
+```
+### BingAI
+#### Linux
+```curl
+curl -N -X POST -H "Content-Type: application/json" --data '{"message":"hi how are you"}' http://localhost:8080/bing
+```
+#### Windows
+```curl
+curl -N -X POST -H "Content-Type: application/json" --data "{\"message\":\"hi how are you\"}" http://localhost:8080/bing
+```
+### BlackBox
+#### Linux
+```curl
+curl -N -X POST -H "Content-Type: application/json" --data '{"message":"def hello()"}' http://localhost:8080/blackbox
+```
+#### Windows
+```curl
+curl -N -X POST -H "Content-Type: application/json" --data "{\"message\":\"def hello()\"}" http://localhost:8080/blackbox
+```
+---
 ## Contributing
 
 Contributions to S7 Gui V1 are welcome! To contribute, please submit a pull request or open an issue.
@@ -69,3 +106,4 @@ Thank you to the maintainers and contributors of these projects for their hard w
 ## Disclaimer
 
 S7 Gui V1 is a research project and is not intended for use in production environments. The maintainers and contributors of S7 Gui V1 are not responsible for any damage or loss caused by the use of this software.
+

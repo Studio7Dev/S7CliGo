@@ -203,7 +203,7 @@ func NewChatApp() *ChatApp {
 
 func HelpModalMarkdown(w fyne.Window, app *ChatApp) {
 
-	resp, err := http.Get("https://pastebin.com/raw/ULD756dK")
+	resp, err := http.Get("https://hastebin.skyra.pw/raw/iquvebakaq")
 	if err != nil {
 		log.Println("Error fetching README.md:", err)
 		return
@@ -215,6 +215,7 @@ func HelpModalMarkdown(w fyne.Window, app *ChatApp) {
 	}
 	richmd := widget.NewRichTextFromMarkdown(string(body))
 	scroll := container.NewVScroll(richmd)
+	scroll.Direction = container.ScrollBoth
 	scroll.SetMinSize(fyne.NewSize(600, 500))
 	CloseBtn := widget.NewButton("Close", nil)
 	x := container.NewVBox(
