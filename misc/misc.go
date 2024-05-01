@@ -42,6 +42,8 @@ type Data struct {
 	Httphost           string `json:"httphost"`
 }
 
+var InvisFill = "‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎"
+
 func (f Funcs) LoadSettings() (Data, error) {
 	settingsFile, err := os.Open("settings.json")
 	if err != nil {

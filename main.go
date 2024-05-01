@@ -482,7 +482,7 @@ func ModelMenuModal(w fyne.Window, a *ChatApp) {
 		CurrentAIProvider = "openaigpt4"
 	})
 	gpt4_btn.SetIcon(icns.Icons8("256", "chatgpt.png", ""))
-	title_ := widget.NewRichTextFromMarkdown("# Select AI Provider:‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ")
+	title_ := widget.NewRichTextFromMarkdown("# Select AI Provider:" + misc.InvisFill)
 	modelMenu := container.NewVBox(
 		container.NewHBox(
 			title_,
@@ -532,7 +532,7 @@ func ModelMenuModal(w fyne.Window, a *ChatApp) {
 }
 
 func ToolMenu(w fyne.Window, a fyne.App) {
-	title_ := widget.NewRichTextFromMarkdown("# Select a Tool:‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ")
+	title_ := widget.NewRichTextFromMarkdown("# Select a Tool:" + misc.InvisFill)
 	newHaste := widget.NewButton("New Hastebin", func() {
 		hastebin.NewHastebin(w, a)
 	})
