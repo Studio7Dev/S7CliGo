@@ -122,6 +122,7 @@ func NewChatApp() *ChatApp {
 		chatLog,
 	)
 	MContainer.Resize(fyne.NewSize(900, 600))
+	stop_ := 0
 	httpServerStartBtn := widget.NewToolbarAction(icns.Icons8("256", "start.png", "fluency"), func() {
 		httpserver.ProcStop = make(chan struct{})
 		httpserver.WaitGroup.Add(1)
@@ -129,15 +130,20 @@ func NewChatApp() *ChatApp {
 
 		HttpServerStatus = "Running"
 		w.SetTitle(fmt.Sprintf("S7 Gui V1 - Current AI Provider: %s - HTTP API: %s - MSG | > ", CurrentAIProvider, HttpServerStatus))
+		stop_ = 1
 		f_.NotificationModal(w, &misc.ChatApp{a, w, input, chatLog}, "HTTP Server Started", "The HTTP server is now running on "+AppSettings.Httphost)
 	})
 	httpserverStopBtn := widget.NewToolbarAction(icns.Icons8("256", "stop.png", "fluency"), func() {
+		if stop_ == 0 {
+			return
+		}
 		// <-httpserver.ProcStop
 		close(httpserver.ProcStop)
 		// httpserver.WaitGroup.Done()
 		HttpServerStatus = "Stopped"
 		w.SetTitle(fmt.Sprintf("S7 Gui V1 - Current AI Provider: %s - HTTP API: %s - MSG | > ", CurrentAIProvider, HttpServerStatus))
 		f_.NotificationModal(w, &misc.ChatApp{a, w, input, chatLog}, "HTTP Server Stopped", "The HTTP server has been stopped.")
+		stop_ = 0
 	})
 	toolbar := widget.NewToolbar(
 		widget.NewToolbarAction(icns.Icons8("256", "trash--v1.png", ""), func() {
