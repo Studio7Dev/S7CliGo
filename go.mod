@@ -18,6 +18,7 @@ require (
 	github.com/samber/lo v1.39.0
 	github.com/sashabaranov/go-openai v1.23.0
 	github.com/tidwall/gjson v1.17.1
+	golang.design/x/clipboard v0.7.0
 	nhooyr.io/websocket v1.8.11
 )
 
@@ -50,7 +51,6 @@ require (
 	github.com/ysmood/gson v0.7.3 // indirect
 	github.com/ysmood/leakless v0.8.0 // indirect
 	go.uber.org/mock v0.4.0 // indirect
-	golang.design/x/clipboard v0.7.0 // indirect
 	golang.org/x/crypto v0.22.0 // indirect
 	golang.org/x/exp v0.0.0-20240222234643-814bf88cf225 // indirect
 	golang.org/x/exp/shiny v0.0.0-20240416160154-fe59bbe5cc7f // indirect

@@ -41,7 +41,7 @@ var userID = NewBlackboxClient().GenerateUserID()
 func (bb *BlackboxClient) SendMessage(content string, raw bool) http.Response {
 
 	messageID := bb.GenerateID(7)
-	data := strings.NewReader(fmt.Sprintf(`{"messages":[{"id":"%s","role":"user","content":"%s"}],"id":"%s","previewToken":null,"userId":"%s","codeModelMode":true,"agentMode":{},"trendingAgentMode":{},"isMicMode":false,"isChromeExt":false,"githubToken":null}`, messageID, content, messageID, userID))
+	data := strings.NewReader(fmt.Sprintf(`{"webSearchMode":"false","messages":[{"id":"%s","role":"user","content":"%s"}],"id":"%s","previewToken":null,"userId":"%s","codeModelMode":true,"agentMode":{},"trendingAgentMode":{},"isMicMode":false,"isChromeExt":false,"githubToken":null}`, messageID, content, messageID, userID))
 	req, err := http.NewRequest("POST", "https://www.blackbox.ai/api/chat", data)
 	if err != nil {
 		log.Fatal(err)

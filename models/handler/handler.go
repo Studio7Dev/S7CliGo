@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"guiv1/misc"
 	"guiv1/models/blackbox"
+	"guiv1/models/gpt4"
 	"guiv1/models/huggingface"
 	"guiv1/models/merlin"
 	"guiv1/models/tuneapp"
@@ -27,7 +28,10 @@ var (
 	BlackBox_        = blackbox.NewBlackboxClient()
 	tuneclient       = tuneapp.TuneClient{}
 	c, errx          = tuneclient.GetConversations()
-	tune_chat_id     = c[0]["conversation_id"].(string)
+	tune_chat_id     = ""
+	Gpt4Client       = gpt4.GPT4Client{
+		Chatid: tuneclient.NewUuid(),
+	}
 )
 
 func YouAI(message string, chatlog *widget.Entry) error {
@@ -93,7 +97,12 @@ func TuneAppAI(message string, model_ string, chatlog *widget.Entry) error {
 	if err != nil {
 		log.Fatalf("Error getting conversations: %v", err)
 	}
-
+	if settings_.TuneAppAccessToken != "" {
+		tune_chat_id = c[0]["conversation_id"].(string)
+	} else {
+		tune_chat_id = tuneclient.NewChat(model_)
+	}
+	fmt.Println(tune_chat_id)
 	resp, err := tuneclient.SendMessage(message_content, tune_chat_id, model_, false, true, PrevMsgId, UsrPrevId)
 	if err != nil {
 		log.Fatalf("Error sending message: %v", err)
@@ -145,8 +154,9 @@ func BlackBoxAI(message string, chatlog *widget.Entry) error {
 	reply := BlackBox_.SendMessage(message_content, true)
 	chatlog.SetText(chatlog.Text + "BlackBox: " + "" + "\n ")
 	//chatlog.SetText(chatlog.Text + "=======================================================================================\n")
+	reader := bufio.NewReader(reply.Body)
 	for {
-		reader := bufio.NewReader(reply.Body)
+
 		line, err := reader.ReadString('\n')
 		if err != nil {
 			if err == io.EOF {
@@ -362,5 +372,39 @@ func HuggingFaceAI(message string, model_ string, chatlog *widget.Entry) error {
 	// w.(http.Flusher).Flush()
 	chatlog.SetText(chatlog.Text + "\n")
 	fmt.Print("\r\n")
+	return nil
+}
+
+func Gpt4AI(message string, chatlog *widget.Entry) error {
+
+	resp := Gpt4Client.SendMessage(message)
+	reader := bufio.NewReader(resp.Body)
+	chatlog.SetText(chatlog.Text + "OpenAI GPT-4: " + "" + "\n ")
+	for {
+
+		line, err := reader.ReadString('\n')
+		if err != nil {
+			if err == io.EOF {
+				break
+			}
+			log.Fatal(err)
+		}
+		if strings.HasPrefix(line, "data:") {
+			line = line[5:]
+			var response struct {
+				Type string      `json:"type"`
+				Data interface{} `json:"data"`
+			}
+			err = json.Unmarshal([]byte(line), &response)
+			if err != nil {
+				log.Fatal(err)
+			}
+			if response.Type == "live" {
+				chatlog.SetText(chatlog.Text + response.Data.(string))
+			}
+		}
+
+	}
+	chatlog.SetText(chatlog.Text + "\n")
 	return nil
 }

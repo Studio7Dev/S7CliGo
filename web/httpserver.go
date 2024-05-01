@@ -2,6 +2,7 @@ package httpserver
 
 import (
 	"guiv1/misc"
+	"sync"
 
 	"bufio"
 	"context"
@@ -428,23 +429,59 @@ func TuneAIChat(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func NewHttpServer() {
+func Index(w http.ResponseWriter, r *http.Request) {
+	if r.Method == http.MethodGet {
+		w.Write([]byte("OK"))
+	} else {
+		http.Error(w, "Only GET requests supported", http.StatusNotImplemented)
+	}
+}
+
+type Web struct {
+	server *http.Server
+}
+
+var (
+	WaitGroup sync.WaitGroup
+	ProcStop  = make(chan struct{})
+)
+
+func (w Web) Init_Routes() {
+	http.HandleFunc("/", Index)
+	http.HandleFunc("/merlin", MerlinChat)
+	http.HandleFunc("/hug", HugChat)
+	http.HandleFunc("/bing", BingChat)
+	http.HandleFunc("/blackbox", BlackBoxChat)
+}
+
+func (w Web) NewHttpServer() {
+	defer WaitGroup.Done()
 	fmt.Println("Starting HTTP server...")
 	if setterr != nil {
 		log.Printf("Error loading settings: %v", setterr)
 		return
 	}
 	// Register the handler function for the path "/process".
-	http.HandleFunc("/merlin", MerlinChat)
-	http.HandleFunc("/hug", HugChat)
-	http.HandleFunc("/bing", BingChat)
-	http.HandleFunc("/blackbox", BlackBoxChat)
+
 	// http.HandleFunc("/youai", YouAIChat)
 	// http.HandleFunc("/goliath", GoliathAIChat)
 	// http.HandleFunc("/tune", TuneAIChat)
+	w.server = &http.Server{Addr: settings.Httphost}
 	fmt.Println("HTTP server started on:", settings.Httphost)
 	// Start the web server on port 8080 and handle requests to localhost.
-	if err := http.ListenAndServe(settings.Httphost, nil); err != nil {
-		log.Fatalf("Failed to start server: %v", err)
+	go func() {
+		// if err := http.ListenAndServe(settings.Httphost, nil); err != nil {
+		// 	log.Fatalf("Failed to start server: %v", err)
+		// }
+		if err := w.server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+			fmt.Println("HTTP server error:", err)
+		}
+	}()
+	<-ProcStop
+	err := w.server.Shutdown(context.Background())
+	if err != nil {
+		log.Printf("Error shutting down HTTP server: %v", err)
 	}
+	fmt.Println("HTTP server stopped")
+
 }

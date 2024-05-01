@@ -15,7 +15,12 @@ import (
 	"sync"
 
 	"fyne.io/fyne/v2"
+	"fyne.io/fyne/v2/container"
+	"fyne.io/fyne/v2/widget"
 )
+
+type Init_ struct {
+}
 
 type Funcs struct {
 }
@@ -180,4 +185,34 @@ func (iu IconUtil) Icons8(uuid string, name string, category string) fyne.Resour
 		log.Fatalf("Failed to read icon response body: %v", err)
 	}
 	return fyne.NewStaticResource(name, IconBytes)
+}
+
+type ChatApp struct {
+	App     fyne.App
+	Win     fyne.Window
+	Input   *widget.Entry
+	ChatLog *widget.Entry
+}
+
+func (f Funcs) NotificationModal(w fyne.Window, a *ChatApp, title string, message string) {
+	title_element := widget.NewRichTextFromMarkdown(fmt.Sprintf("# %s", title))
+
+	notification := container.NewBorder(
+		title_element,
+		container.NewVBox(
+			widget.NewRichTextFromMarkdown(fmt.Sprintf("##  %s", message)),
+			widget.NewButton("OK", nil),
+		),
+		nil,
+		nil,
+	)
+	popup := widget.NewModalPopUp(notification, w.Canvas())
+	popup.CreateRenderer().Layout(notification.Size())
+	OKBtn := notification.Objects[1].(*fyne.Container).Objects[1].(*widget.Button)
+	OKBtn.SetIcon(IconUtil{}.Icons8("256", "checkmark--v1.png", ""))
+	OKBtn.OnTapped = func() {
+		popup.Hide()
+	}
+	popup.Resize(fyne.NewSize(300, 150))
+	popup.Show()
 }

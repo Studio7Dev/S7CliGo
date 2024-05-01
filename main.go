@@ -5,11 +5,15 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
+	"net/http"
 
 	"guiv1/misc"
 	"guiv1/models/handler"
 	"guiv1/models/huggingface"
 	"guiv1/models/tuneapp"
+	httpserver "guiv1/web"
+
+	"guiv1/windows/mailraid"
 
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/app"
@@ -23,6 +27,7 @@ import (
 var (
 	f_                   = misc.Funcs{}
 	icns                 = misc.IconUtil{}
+	Chap                 = &misc.ChatApp{}
 	hugmodels, err       = huggingface.NewHug().GetModels()
 	cliperr              = clipboard.Init()
 	tuneclient           = tuneapp.TuneClient{}
@@ -31,6 +36,7 @@ var (
 	CurrentAIProvider    = "merlin"
 	CurrentHugModel      = AppSettings.CurrentHugModel
 	CurrentTuneAppModel  = AppSettings.CurrentTuneModel
+	HttpServerStatus     = "Stopped"
 )
 
 type ChatApp struct {
@@ -41,14 +47,18 @@ type ChatApp struct {
 }
 
 func NewChatApp() *ChatApp {
+
+	web_ := httpserver.Web{}
+	web_.Init_Routes()
 	a := app.New()
 
 	w := a.NewWindow("S7 Gui V1")
+
 	w.Resize(fyne.NewSize(1200, 800))
 	w.SetFixedSize(true)
 	w.CenterOnScreen()
 	w.SetIcon(icns.Icon("appicon"))
-	w.SetTitle(fmt.Sprintf("S7 Gui V1 - Current AI Provider: %s", CurrentAIProvider))
+	w.SetTitle(fmt.Sprintf("S7 Gui V1 - Current AI Provider: %s - HTTP API: %s - MSG | > ", CurrentAIProvider, HttpServerStatus))
 	if AppSettings.DarkMode {
 		a.Settings().SetTheme(theme.DarkTheme())
 	} else {
@@ -111,6 +121,23 @@ func NewChatApp() *ChatApp {
 		chatLog,
 	)
 	MContainer.Resize(fyne.NewSize(900, 600))
+	httpServerStartBtn := widget.NewToolbarAction(icns.Icons8("256", "start.png", "fluency"), func() {
+		httpserver.ProcStop = make(chan struct{})
+		httpserver.WaitGroup.Add(1)
+		go web_.NewHttpServer()
+
+		HttpServerStatus = "Running"
+		w.SetTitle(fmt.Sprintf("S7 Gui V1 - Current AI Provider: %s - HTTP API: %s - MSG | > ", CurrentAIProvider, HttpServerStatus))
+		f_.NotificationModal(w, &misc.ChatApp{a, w, input, chatLog}, "HTTP Server Started", "The HTTP server is now running on "+AppSettings.Httphost)
+	})
+	httpserverStopBtn := widget.NewToolbarAction(icns.Icons8("256", "stop.png", "fluency"), func() {
+		// <-httpserver.ProcStop
+		close(httpserver.ProcStop)
+		// httpserver.WaitGroup.Done()
+		HttpServerStatus = "Stopped"
+		w.SetTitle(fmt.Sprintf("S7 Gui V1 - Current AI Provider: %s - HTTP API: %s - MSG | > ", CurrentAIProvider, HttpServerStatus))
+		f_.NotificationModal(w, &misc.ChatApp{a, w, input, chatLog}, "HTTP Server Stopped", "The HTTP server has been stopped.")
+	})
 	toolbar := widget.NewToolbar(
 		widget.NewToolbarAction(icns.Icons8("256", "trash--v1.png", ""), func() {
 			chatLog.SetText("")
@@ -128,13 +155,23 @@ func NewChatApp() *ChatApp {
 			ModelMenuModal(w, &ChatApp{a, w, input, chatLog})
 		}),
 		widget.NewToolbarSpacer(),
+		widget.NewToolbarSeparator(),
+		httpServerStartBtn,
+		widget.NewToolbarSeparator(),
+		httpserverStopBtn,
+		widget.NewToolbarSeparator(),
+		widget.NewToolbarSpacer(),
+		widget.NewToolbarAction(icns.Icons8("256", "bomb-emoji.png", "emoji"), func() {
+			mailraid.RaidWindow(a, w)
+		}),
 		widget.NewToolbarAction(icns.Icons8("256", "help--v1.png", ""), func() {
 			log.Println("Display help")
+			HelpModalMarkdown(w, &ChatApp{a, w, input, chatLog})
 		}),
 		widget.NewToolbarAction(icns.Icons8("256", "services--v1.png", ""), func() {
 			showSettingsModal(w, &ChatApp{a, w, input, chatLog})
 		}),
-		widget.NewToolbarAction(icns.Icons8("256", "shutdown--v1.png", ""), func() {
+		widget.NewToolbarAction(icns.Icons8("256", "fire-exit.png", ""), func() {
 			w.Close()
 		}),
 	)
@@ -153,13 +190,48 @@ func NewChatApp() *ChatApp {
 	return &ChatApp{a, w, input, chatLog}
 }
 
-func CodeModal(w fyne.Window, app *ChatApp) {
-	richcodemd := widget.NewRichTextFromMarkdown(app.chatLog.Text)
+func HelpModalMarkdown(w fyne.Window, app *ChatApp) {
+
+	resp, err := http.Get("https://pastebin.com/raw/ULD756dK")
+	if err != nil {
+		log.Println("Error fetching README.md:", err)
+		return
+	}
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		log.Println("Error reading README.md:", err)
+		return
+	}
+	richmd := widget.NewRichTextFromMarkdown(string(body))
+	scroll := container.NewVScroll(richmd)
+	scroll.SetMinSize(fyne.NewSize(600, 500))
+	CloseBtn := widget.NewButton("Close", nil)
+	x := container.NewVBox(
+		widget.NewLabel("Readme.md"),
+		widget.NewSeparator(),
+		scroll,
+		container.NewHBox(
+			layout.NewSpacer(),
+			CloseBtn,
+			layout.NewSpacer(),
+		),
+	)
+
+	modal := widget.NewModalPopUp(x, w.Canvas())
+	CloseBtn.OnTapped = func() {
+		modal.Hide()
+	}
+	modal.Resize(fyne.NewSize(700, 600))
+	modal.Show()
+}
+
+func CodeModal(w fyne.Window, App *ChatApp) {
+	richcodemd := widget.NewRichTextFromMarkdown(App.chatLog.Text)
 	richcodemd.Resize(fyne.NewSize(800, 550))
 	scroll := container.NewVScroll(richcodemd)
 	scroll.SetMinSize(fyne.NewSize(700, 600))
 	copybtn := widget.NewButton("Copy", func() {
-		clipboard.Write(clipboard.FmtText, []byte(app.chatLog.Text))
+		clipboard.Write(clipboard.FmtText, []byte(App.chatLog.Text))
 	})
 	copybtn.SetIcon(icns.Icons8("256", "copy--v1.png", ""))
 	OKBtn := widget.NewButton("OK", nil)
@@ -192,7 +264,7 @@ func NewUserMessageElement(message string) *widget.RichText {
 
 func getAIResponse(input string, chatlog *widget.Entry, w fyne.Window) string {
 	fmt.Println("Current model:", CurrentAIProvider)
-	w.SetTitle(fmt.Sprintf("S7 Gui V1 - Current AI Provider: %s | > %s", CurrentAIProvider, input))
+	w.SetTitle(fmt.Sprintf("S7 Gui V1 - Current AI Provider: %s - HTTP API: %s - MSG | > %s", CurrentAIProvider, HttpServerStatus, input))
 	if CurrentAIProvider == "merlin" {
 		handler.MerlinAI_(input, chatlog)
 	}
@@ -211,6 +283,9 @@ func getAIResponse(input string, chatlog *widget.Entry, w fyne.Window) string {
 	}
 	if CurrentAIProvider == "youai" {
 		handler.YouAI(input, chatlog)
+	}
+	if CurrentAIProvider == "openaigpt4" {
+		handler.Gpt4AI(input, chatlog)
 	}
 	return "I'm not sure I understand. Can you please rephrase?"
 }
@@ -348,6 +423,7 @@ func showSettingsModal(w fyne.Window, a *ChatApp) {
 	BingHost.Text = AppSettings.BingHost
 	popup.Show()
 }
+
 func NotificationModal(w fyne.Window, a *ChatApp, title string, message string) {
 	title_element := widget.NewRichTextFromMarkdown(fmt.Sprintf("# %s", title))
 
@@ -398,6 +474,10 @@ func ModelMenuModal(w fyne.Window, a *ChatApp) {
 		CurrentAIProvider = "youai"
 	})
 	youai_btn.SetIcon(icns.Icon("youai"))
+	gpt4_btn := widget.NewButton("GPT-4", func() {
+		CurrentAIProvider = "openaigpt4"
+	})
+	gpt4_btn.SetIcon(icns.Icons8("256", "chatgpt.png", ""))
 	title_ := widget.NewRichTextFromMarkdown("# Select AI Provider: ")
 	modelMenu := container.NewVBox(
 		container.NewHBox(
@@ -416,6 +496,7 @@ func ModelMenuModal(w fyne.Window, a *ChatApp) {
 		blackbox_btn,
 		tuneapp_btn,
 		youai_btn,
+		gpt4_btn,
 	)
 
 	popup := widget.NewModalPopUp(modelMenu, w.Canvas())
@@ -430,12 +511,13 @@ func ModelMenuModal(w fyne.Window, a *ChatApp) {
 	cancelbtn.SetIcon(icns.Icons8("256", "cancel--v1.png", ""))
 	cancelbtn.ToolbarObject().Resize(fyne.NewSize(100, 100))
 	cancelbtn.ToolbarObject().Refresh()
-	Providers := []string{"merlin", "bing", "hugging-face", "black-box", "tune-app", "youai"}
+	toolbar_.Refresh()
+	Providers := []string{"merlin", "bing", "hugging-face", "black-box", "tune-app", "youai", "openaigpt4"}
 	for i, btn := range popup.Content.(*fyne.Container).Objects {
 		if _, ok := btn.(*fyne.Container); !ok {
 			btn.(*widget.Button).OnTapped = func() {
 				CurrentAIProvider = Providers[i-1]
-				w.SetTitle(fmt.Sprintf("S7 Gui V1 - Current AI Provider: %s", CurrentAIProvider))
+				w.SetTitle(fmt.Sprintf("S7 Gui V1 - Current AI Provider: %s - HTTP API: %s - MSG | > ", CurrentAIProvider, HttpServerStatus))
 				popup.Hide()
 
 			}
