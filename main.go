@@ -13,6 +13,7 @@ import (
 	"guiv1/models/tuneapp"
 	httpserver "guiv1/web"
 
+	"guiv1/windows/hastebin"
 	"guiv1/windows/mailraid"
 
 	"fyne.io/fyne/v2"
@@ -163,6 +164,9 @@ func NewChatApp() *ChatApp {
 		widget.NewToolbarSpacer(),
 		widget.NewToolbarAction(icns.Icons8("256", "bomb-emoji.png", "emoji"), func() {
 			mailraid.RaidWindow(a, w)
+		}),
+		widget.NewToolbarAction(icns.Icons8("256", "maintenance.png", ""), func() {
+			ToolMenu(w, a)
 		}),
 		widget.NewToolbarAction(icns.Icons8("256", "help--v1.png", ""), func() {
 			log.Println("Display help")
@@ -478,7 +482,7 @@ func ModelMenuModal(w fyne.Window, a *ChatApp) {
 		CurrentAIProvider = "openaigpt4"
 	})
 	gpt4_btn.SetIcon(icns.Icons8("256", "chatgpt.png", ""))
-	title_ := widget.NewRichTextFromMarkdown("# Select AI Provider: ")
+	title_ := widget.NewRichTextFromMarkdown("# Select AI Provider:‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ")
 	modelMenu := container.NewVBox(
 		container.NewHBox(
 			title_,
@@ -527,6 +531,42 @@ func ModelMenuModal(w fyne.Window, a *ChatApp) {
 	popup.Show()
 }
 
+func ToolMenu(w fyne.Window, a fyne.App) {
+	title_ := widget.NewRichTextFromMarkdown("# Select a Tool:‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ")
+	newHaste := widget.NewButton("New Hastebin", func() {
+		hastebin.NewHastebin(w, a)
+	})
+	newHaste.SetIcon(icns.IconFromBytes("hastebin", icns.IconByteLoader("hb_400x400", "")))
+	modelMenu := container.NewVBox(
+		container.NewHBox(
+			title_,
+			widget.NewSeparator(),
+			widget.NewToolbar(
+				widget.NewToolbarSpacer(),
+				widget.NewToolbarSpacer(),
+				widget.NewToolbarSpacer(),
+				widget.NewToolbarAction(icns.Icons8("256", "cancel--v1.png", ""), nil),
+			),
+		),
+		newHaste,
+	)
+
+	popup := widget.NewModalPopUp(modelMenu, w.Canvas())
+	popup.Resize(fyne.NewSize(300, 200))
+	toolbar_ := popup.Content.(*fyne.Container).Objects[0].(*fyne.Container).Objects[2].(*widget.Toolbar)
+	toolbar_.Resize(fyne.NewSize(300, 100))
+	toolbar_.Refresh()
+	cancelbtn := popup.Content.(*fyne.Container).Objects[0].(*fyne.Container).Objects[2].(*widget.Toolbar).Items[3].(*widget.ToolbarAction)
+	cancelbtn.OnActivated = func() {
+		popup.Hide()
+	}
+	cancelbtn.SetIcon(icns.Icons8("256", "cancel--v1.png", ""))
+	cancelbtn.ToolbarObject().Resize(fyne.NewSize(100, 100))
+	cancelbtn.ToolbarObject().Refresh()
+	toolbar_.Refresh()
+
+	popup.Show()
+}
 func main() {
 	app := NewChatApp()
 	app.win.ShowAndRun()
