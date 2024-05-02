@@ -238,6 +238,11 @@ func HelpModalMarkdown(w fyne.Window, app *ChatApp) {
 		modal.Hide()
 	}
 	modal.Resize(fyne.NewSize(700, 600))
+	modal.Canvas.SetOnTypedKey(func(event *fyne.KeyEvent) {
+		if event.Name == fyne.KeyEscape {
+			modal.Hide()
+		}
+	})
 	modal.Show()
 }
 
@@ -268,6 +273,11 @@ func CodeModal(w fyne.Window, App *ChatApp) {
 	}
 
 	popup.Resize(fyne.NewSize(900, 600))
+	popup.Canvas.SetOnTypedKey(func(event *fyne.KeyEvent) {
+		if event.Name == fyne.KeyEscape {
+			popup.Hide()
+		}
+	})
 	popup.Show()
 }
 
@@ -437,6 +447,11 @@ func showSettingsModal(w fyne.Window, a *ChatApp) {
 	TCPHost.Text = AppSettings.TcpHost
 	HTTPHost.Text = AppSettings.Httphost
 	BingHost.Text = AppSettings.BingHost
+	popup.Canvas.SetOnTypedKey(func(event *fyne.KeyEvent) {
+		if event.Name == fyne.KeyEscape {
+			popup.Hide()
+		}
+	})
 	popup.Show()
 }
 
@@ -460,6 +475,11 @@ func NotificationModal(w fyne.Window, a *ChatApp, title string, message string) 
 		popup.Hide()
 	}
 	popup.Resize(fyne.NewSize(300, 150))
+	popup.Canvas.SetOnTypedKey(func(event *fyne.KeyEvent) {
+		if event.Name == fyne.KeyEscape {
+			popup.Hide()
+		}
+	})
 	popup.Show()
 }
 
@@ -539,7 +559,11 @@ func ModelMenuModal(w fyne.Window, a *ChatApp) {
 			}
 		}
 	}
-
+	popup.Canvas.SetOnTypedKey(func(event *fyne.KeyEvent) {
+		if event.Name == fyne.KeyEscape {
+			popup.Hide()
+		}
+	})
 	popup.Show()
 }
 
@@ -576,7 +600,11 @@ func ToolMenu(w fyne.Window, a fyne.App) {
 	cancelbtn.ToolbarObject().Resize(fyne.NewSize(100, 100))
 	cancelbtn.ToolbarObject().Refresh()
 	toolbar_.Refresh()
-
+	popup.Canvas.SetOnTypedKey(func(event *fyne.KeyEvent) {
+		if event.Name == fyne.KeyEscape {
+			popup.Hide()
+		}
+	})
 	popup.Show()
 }
 func main() {
