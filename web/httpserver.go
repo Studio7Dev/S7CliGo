@@ -9,6 +9,7 @@ import (
 	"encoding/json"
 	"fmt"
 	BlackBox "guiv1/models/blackbox"
+	"guiv1/models/gpt4"
 	HugginFace "guiv1/models/huggingface"
 	MerlinAI "guiv1/models/merlin"
 	"guiv1/models/sydney"
@@ -27,6 +28,10 @@ import (
 var (
 	f_                = misc.Funcs{}
 	settings, setterr = f_.LoadSettings()
+	gpt4_client_      = gpt4.GPT4Client{}
+	merlin_authToken  = settings.MerlinAuthToken
+	merlin_chatID     = "43ac5495-e1e1-4a68-9115-" + random.String(8)
+	merlin_client     = MerlinAI.NewMerlin(merlin_authToken, merlin_chatID)
 )
 
 func MerlinChat(w http.ResponseWriter, r *http.Request) {
@@ -43,11 +48,8 @@ func MerlinChat(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		message_content := bodyJson["message"].(string)
-		authToken := settings.MerlinAuthToken
-		chatID := "43ac5495-e1e1-4a68-9115-" + random.String(8)
-		m := MerlinAI.NewMerlin(authToken, chatID)
 
-		responseBody, err := m.Chat(message_content)
+		responseBody, err := merlin_client.Chat(message_content)
 		if err != nil {
 			log.Fatalf("Error chatting with Merlin: %v", err)
 		}
@@ -420,6 +422,60 @@ func TuneAIChat(w http.ResponseWriter, r *http.Request) {
 			if value_ != nil {
 				w.Write([]byte(value_.(string)))
 				w.(http.Flusher).Flush()
+			}
+
+		}
+	} else {
+		http.Error(w, "Only POST requests supported", http.StatusNotImplemented)
+		return
+	}
+}
+
+func Gpt4AI(w http.ResponseWriter, r *http.Request) {
+
+	if r.Method == http.MethodPost {
+		body, err := ioutil.ReadAll(r.Body)
+		if err != nil {
+			http.Error(w, "Failed to read request body", http.StatusInternalServerError)
+			return
+		}
+		bodyJson := make(map[string]interface{})
+		err = json.Unmarshal(body, &bodyJson)
+		if err != nil {
+			http.Error(w, "Failed to parse request body", http.StatusBadRequest)
+			return
+		}
+		message_content := bodyJson["message"].(string)
+
+		resp := gpt4_client_.SendMessage(message_content)
+		reader := bufio.NewReader(resp.Body)
+		for {
+
+			line, err := reader.ReadString('\n')
+			if err != nil {
+				if err == io.EOF {
+					break
+				}
+				log.Fatal(err)
+			}
+			if strings.HasPrefix(line, "data:") {
+				line = line[5:]
+				var response struct {
+					Type string      `json:"type"`
+					Data interface{} `json:"data"`
+				}
+				err = json.Unmarshal([]byte(line), &response)
+				if err != nil {
+					log.Fatal(err)
+				}
+				if response.Type == "live" {
+					w.Write([]byte(response.Data.(string)))
+					w.(http.Flusher).Flush()
+				} else if response.Type == "end" {
+					w.Write([]byte("\n[DONE]"))
+					w.(http.Flusher).Flush()
+					break
+				}
 			}
 
 		}

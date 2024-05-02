@@ -15,8 +15,10 @@ import (
 	"sync"
 
 	"fyne.io/fyne/v2"
+	"fyne.io/fyne/v2/canvas"
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/widget"
+	"github.com/google/uuid"
 )
 
 type Init_ struct {
@@ -187,6 +189,40 @@ func (iu IconUtil) Icons8(uuid string, name string, category string) fyne.Resour
 		log.Fatalf("Failed to read icon response body: %v", err)
 	}
 	return fyne.NewStaticResource(name, IconBytes)
+}
+
+type ImageUtil struct{}
+
+func NewUuid() string {
+	uuid_base, err := uuid.NewUUID()
+	if err != nil {
+		log.Fatal(err)
+	}
+	return uuid_base.String()
+}
+
+func (iu ImageUtil) LoadImageFromBytes(name string, data []byte) fyne.Resource {
+	return fyne.NewStaticResource(name, data)
+}
+func (iu ImageUtil) LoadImageFromUri(name string, uri string) fyne.Resource {
+	resp, err := http.Get(uri)
+	if err != nil {
+		log.Fatalf("Failed to fetch image: %v", err)
+	}
+	defer resp.Body.Close()
+	data, err := io.ReadAll(resp.Body)
+	if err != nil {
+		log.Fatalf("Failed to read image response body: %v", err)
+	}
+	return iu.LoadImageFromBytes(name, data)
+}
+func (iu ImageUtil) NewCanvasImageUri(w float32, h float32, uri string) *fyne.Container {
+	Image_ := canvas.NewImageFromResource(iu.LoadImageFromUri(NewUuid(), uri))
+	// Image_.FillMode = canvas.ImageFillContain
+	Image_.SetMinSize(fyne.Size{Width: w, Height: h})
+	Image_.Resize(fyne.Size{Width: w, Height: h})
+	view := container.NewHBox(Image_)
+	return view
 }
 
 type ChatApp struct {

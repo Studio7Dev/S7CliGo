@@ -14,6 +14,7 @@ import (
 	httpserver "guiv1/web"
 
 	"guiv1/windows/hastebin"
+	"guiv1/windows/imagegen"
 	"guiv1/windows/mailraid"
 
 	"fyne.io/fyne/v2"
@@ -55,7 +56,7 @@ func NewChatApp() *ChatApp {
 
 	w := a.NewWindow("S7 Gui V1")
 
-	w.Resize(fyne.NewSize(1200, 800))
+	w.Resize(fyne.NewSize(1300, 900))
 	w.SetFixedSize(true)
 	w.CenterOnScreen()
 	w.SetIcon(icns.Icon("appicon"))
@@ -161,6 +162,9 @@ func NewChatApp() *ChatApp {
 		}),
 		widget.NewToolbarAction(icns.Icons8("256", "chatgpt.png", "nolan"), func() {
 			ModelMenuModal(w, &ChatApp{a, w, input, chatLog})
+		}),
+		widget.NewToolbarAction(icns.Icon("stabledef"), func() {
+			imagegen.ImageGenerationWindow(a, w)
 		}),
 		widget.NewToolbarSpacer(),
 		widget.NewToolbarSeparator(),

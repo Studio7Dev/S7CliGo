@@ -84,5 +84,10 @@ func NewHastebin(w fyne.Window, app fyne.App) {
 
 	}
 	modal.Resize(fyne.NewSize(700, 600))
+	modal.Canvas.SetOnTypedKey(func(event *fyne.KeyEvent) {
+		if event.Name == fyne.KeyEscape {
+			modal.Hide()
+		}
+	})
 	modal.Show()
 }
