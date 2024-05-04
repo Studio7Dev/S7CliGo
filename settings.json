@@ -1,0 +1,17 @@
+{
+  "dark_mode": true,
+  "bing_host": "localhost:8080",
+  "current_tune_model": "rohan/Meta-Llama-3-8B-Instruct",
+  "current_hug_model": "mistralai/Mistral-7B-Instruct-v0.2",
+  "goliath_auth_token": "",
+  "merlin_auth_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJkZXRhaWxzIjp7Im5hbWUiOiJkZXggcm9hZG1hbiIsInBpY3R1cmUiOiJodHRwczovL2xoMy5nb29nbGV1c2VyY29udGVudC5jb20vYS9BQ2c4b2NKQ21tX01ib2FhR0hXQ19PWndoYTBWX2VZbkRVdUF4S2ppZUo3c3g0dWI9czk2LWMiLCJpc3MiOiJodHRwczovL3NlY3VyZXRva2VuLmdvb2dsZS5jb20vZm95ZXItd29yayIsImF1ZCI6ImZveWVyLXdvcmsiLCJhdXRoX3RpbWUiOjE3MTE0MTEzMTMsInVzZXJfaWQiOiJoNmc2QjNOZTAxZVZyWUdoOWpndEc0Q09GTmIyIiwic3ViIjoiaDZnNkIzTmUwMWVWcllHaDlqZ3RHNENPRk5iMiIsImlhdCI6MTcxMTQxMTMxMywiZXhwIjoxNzExNDE0OTEzLCJlbWFpbCI6ImRleHRlcnNtYWRuZXNzNjY2QGdtYWlsLmNvbSIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJmaXJlYmFzZSI6eyJpZGVudGl0aWVzIjp7Imdvb2dsZS5jb20iOlsiMTExODY1MjU1NTc5MjQzMzAxNTEwIl0sImVtYWlsIjpbImRleHRlcnNtYWRuZXNzNjY2QGdtYWlsLmNvbSJdfSwic2lnbl9pbl9wcm92aWRlciI6Imdvb2dsZS5jb20ifSwidWlkIjoiaDZnNkIzTmUwMWVWcllHaDlqZ3RHNENPRk5iMiJ9LCJpYXQiOjE3MTE0MTEzMTYsImV4cCI6MTcxNjU5NTMxNn0.eZmyYOeqD13KOUV58MnGEQgrZl16-gQWUxWcUGqLe4Q",
+  "tuneapp_auth_token": "",
+  "huggingface_cookie": "./data/huggingfacecookies.json",
+  "bing_cookie": "./data/bingcookies.json",
+  "blackbox_cookie": "",
+  "youai_cookie": "./data/youaicookies.json",
+  "username": "admin",
+  "password": "admin",
+  "tcphost": "0.0.0.0:1337",
+  "httphost": "0.0.0.0:8081"
+}
