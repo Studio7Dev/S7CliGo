@@ -47,9 +47,7 @@ func (s *ChatClient) FindRandomUUID(text string) string {
 
 	if len(uuids) > 0 {
 		rand.Seed(time.Now().UnixNano())
-		// find the last uuid in the list
 		return uuids[len(uuids)-1]
-		//return uuids[rand.Intn(len(uuids))]
 	}
 
 	return ""
@@ -132,8 +130,6 @@ type MessageData struct {
 }
 
 func (c *ChatClient) SendMessage(message string, convId string, Id string, raw bool) (error, http.Response) {
-	//fmt.Println(message, convId, Id)
-	//data := strings.NewReader(fmt.Sprintf(`{"inputs":"%s","id":"%s","is_retry":false,"is_continue":false,"web_search":false,"files":[]}`, message, Id))
 	var messageData = MessageData{
 		Inputs:     message,
 		Id:         Id,
@@ -171,7 +167,6 @@ func (c *ChatClient) SendMessage(message string, convId string, Id string, raw b
 			Header:     resp.Header,
 		}
 	}
-	// defer resp.Body.Close()
 
 	contentType := resp.Header.Get("Content-Type")
 	if contentType != "text/event-stream" {
@@ -246,22 +241,6 @@ func (c ChatClient) GetModels() ([]string, error) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	// doc, err := html.Parse(strings.NewReader(string(bodyText)))
-	// if err != nil {
-	// 	log.Fatal(err)
-	// }
-	// var traverse func(*html.Node)
-	// traverse = func(n *html.Node) {
-	// 	if n.Type == html.ElementNode {
-	// 		fmt.Println(n.Data) // Print the name of the HTML element
-	// 	}
-	// 	for c := n.FirstChild; c != nil; c = c.NextSibling {
-	// 		traverse(c)
-	// 	}
-	// }
-
-	// Traverse the HTML document
-	// traverse(doc)
 
 	doc, err := html.Parse(strings.NewReader(string(bodyText)))
 	if err != nil {
@@ -269,8 +248,6 @@ func (c ChatClient) GetModels() ([]string, error) {
 		return nil, err
 	}
 
-	// Find all "dt" tags and print their text
-	// make a string list
 	models := []string{}
 	var f func(*html.Node)
 	f = func(n *html.Node) {
@@ -283,8 +260,6 @@ func (c ChatClient) GetModels() ([]string, error) {
 		}
 	}
 	f(doc)
-	// get elements by the html tag "dd"
-	// extract the text content of each "dd" element and append it to the models slice
 	var g func(*html.Node)
 	g = func(n *html.Node) {
 		if n.Type == html.ElementNode && n.Data == "dd" {

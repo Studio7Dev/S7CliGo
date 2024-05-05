@@ -12,9 +12,7 @@ import (
 
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/container"
-	"fyne.io/fyne/v2/storage"
 	"fyne.io/fyne/v2/widget"
-	wx "fyne.io/x/fyne/widget"
 	"golang.org/x/net/html"
 )
 
@@ -61,11 +59,9 @@ func GetNonce() string {
 		return ""
 	}
 
-	// Find all "dt" tags and print their text
 	var f func(*html.Node)
 	f = func(n *html.Node) {
 		if n.Type == html.ElementNode && n.Data == "script" {
-			// get by id
 			for _, a := range n.Attr {
 				if a.Key == "id" {
 					if a.Val == "jetpack-instant-search-js-before" {
@@ -134,9 +130,6 @@ func DalleImage(prompt string) (string, error) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	// if json_event["type"] == "error" {
-	// 	return "", fmt.Errorf("DALL-E API error: %s", json_event["data"].(string))
-	// }
 	if json_event["success"] == nil {
 		return "", fmt.Errorf("DALL-E API response did not contain a 'success' field")
 	}
@@ -151,13 +144,8 @@ func DalleImage(prompt string) (string, error) {
 }
 
 func DalleWindow(a fyne.App, w fyne.Window) {
-	gif, err := wx.NewAnimatedGif(storage.NewFileURI("./assets/loading.gif"))
-	gif.SetMinSize(fyne.Size{Width: 512, Height: 512})
-	gif.Resize(fyne.Size{Width: 512, Height: 512})
+	infinite_progress := widget.NewProgressBarInfinite()
 
-	gif_ := container.NewHBox(gif)
-	gif_.Resize(fyne.Size{Width: 512, Height: 512})
-	gif_.Hidden = true
 	PromptEntry := widget.NewEntry()
 	PromptEntry.PlaceHolder = "Enter prompt here"
 	PromptSubmit := widget.NewButton("Generate", nil)
@@ -166,14 +154,12 @@ func DalleWindow(a fyne.App, w fyne.Window) {
 		PromptEntry,
 		PromptSubmit,
 	)
-	// Ctn := container.NewGridWithColumns(2, PromptContainer,gif_)
 	Grid := container.NewCenter()
 
 	title_label := widget.NewRichTextFromMarkdown("# Image Generation ( DALLE 3 ) " + misc.InvisFill + misc.InvisFill)
 	TopBorder := container.NewBorder(
 		container.NewHBox(
 			title_label,
-			// gif_,
 			widget.NewSeparator(),
 			widget.NewToolbar(
 				widget.NewToolbarSpacer(),
@@ -189,15 +175,11 @@ func DalleWindow(a fyne.App, w fyne.Window) {
 	)
 	Images_ := container.NewBorder(
 		TopBorder,
-		PromptContainer,
+		container.NewVBox(PromptContainer, infinite_progress),
 		nil,
 		nil,
 		nil,
 	)
-	// Grid.Add(iu.NewCanvasImageUri(256, 256, "https://media1.tenor.com/m/ZFc20z8DItkAAAAC/facepalm-really.gif"))
-	// Grid.Add(iu.NewCanvasImageUri(256, 256, "https://img.icons8.com/color/512/bomb-with-timer.png"))
-	// Grid.Add(iu.NewCanvasImageUri(256, 256, "https://img.icons8.com/color/512/bomb-with-timer.png"))
-	// Grid.Add(iu.NewCanvasImageUri(256, 256, "https://img.icons8.com/color/512/bomb-with-timer.png"))
 	Grid.Refresh()
 	Images_.Refresh()
 
@@ -214,9 +196,9 @@ func DalleWindow(a fyne.App, w fyne.Window) {
 	TopBorder.Objects[0].(*fyne.Container).Objects[2].(*widget.Toolbar).Items[3].(*widget.ToolbarAction).OnActivated = func() {
 		modal.Hide()
 	}
+	infinite_progress.Hidden = true
 	PromptSubmit.OnTapped = func() {
-		gif_.Hidden = false
-		gif.Start()
+		infinite_progress.Hidden = false
 		if err != nil {
 			log.Fatalf("Error creating animated GIF: %v", err)
 		}
@@ -225,14 +207,12 @@ func DalleWindow(a fyne.App, w fyne.Window) {
 		PromptEntry.Text = ""
 		PromptEntry.Refresh()
 		text := PromptEntry.Text
-		Grid.Add(gif_)
 		Gen, err := DalleImage(text)
 		if err != nil {
 
 		}
 		Grid.RemoveAll()
-		gif.Stop()
-		gif_.Hidden = true
+		infinite_progress.Hidden = true
 		if Gen != "" {
 			image_url := Gen
 			Grid.Add(iu.NewCanvasImageUri(512, 512, image_url))
@@ -244,8 +224,7 @@ func DalleWindow(a fyne.App, w fyne.Window) {
 		}
 	}
 	PromptEntry.OnSubmitted = func(text string) {
-		gif_.Hidden = false
-		gif.Start()
+		infinite_progress.Hidden = false
 		if err != nil {
 			log.Fatalf("Error creating animated GIF: %v", err)
 		}
@@ -253,14 +232,12 @@ func DalleWindow(a fyne.App, w fyne.Window) {
 
 		PromptEntry.Text = ""
 		PromptEntry.Refresh()
-		Grid.Add(gif_)
 		Gen, err := DalleImage(text)
 		if err != nil {
 
 		}
 		Grid.RemoveAll()
-		gif.Stop()
-		gif_.Hidden = true
+		infinite_progress.Hidden = true
 		if Gen != "" {
 			image_url := Gen
 			Grid.Add(iu.NewCanvasImageUri(512, 512, image_url))

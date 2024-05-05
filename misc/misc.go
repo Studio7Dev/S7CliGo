@@ -19,6 +19,7 @@ import (
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/canvas"
 	"fyne.io/fyne/v2/container"
+	"fyne.io/fyne/v2/dialog"
 	"fyne.io/fyne/v2/widget"
 	"github.com/google/uuid"
 )
@@ -278,6 +279,17 @@ type ChatApp struct {
 	Win     fyne.Window
 	Input   *widget.Entry
 	ChatLog *widget.Entry
+}
+
+func (f Funcs) YesorNo(w fyne.Window, title, message string, callback func()) {
+	dialog.NewConfirm(title, message, func(b bool) {
+		if b {
+			callback()
+		} else {
+
+		}
+	}, w).Show()
+
 }
 
 func (f Funcs) NotificationModal(w fyne.Window, a *ChatApp, title string, message string) {

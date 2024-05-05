@@ -7,6 +7,8 @@ import (
 	"log"
 	"math/rand"
 	"net/http"
+	"os"
+	"path"
 	"strconv"
 	"time"
 
@@ -65,6 +67,13 @@ type Email struct {
 	Subject     string        `json:"subject"`
 	Text        string        `json:"text"`
 	To          string        `json:"to"`
+}
+
+type Attachment struct {
+	AttachmentId int    `json:"attachment_id"`
+	ContentId    string `json:"content_id"`
+	Name         string `json:"name"`
+	Size         int    `json:"size"`
 }
 
 type Account struct {
@@ -154,6 +163,47 @@ func (tpc TmailPlusClient) GetMessageByID(id int) Email {
 	return Email
 }
 
+func (tpc TmailPlusClient) GetAttachmentByID(mailID int, attachmentID int) string {
+	BaseLink := "https://tempmail.plus/api/mails/" + strconv.Itoa(mailID) + "/attachments/" + strconv.Itoa(attachmentID) + "?email=" + tpc.Username + "@" + tpc.Domain + "&epin="
+	return BaseLink
+}
+func (tpc TmailPlusClient) DownloadAttachments(Email Email) ([]string, error) {
+
+	for _, Attachment_ := range Email.Attachments {
+		var Attachment Attachment
+		Jsondata, err := json.Marshal(Attachment_)
+		if err != nil {
+			return nil, err
+		}
+		err = json.Unmarshal(Jsondata, &Attachment)
+		if err != nil {
+			return nil, err
+		}
+		BaseLink := "https://tempmail.plus/api/mails/" + strconv.Itoa(Email.MailId) + "/attachments/" + strconv.Itoa(Attachment.AttachmentId) + "?email=" + tpc.Username + "@" + tpc.Domain + "&epin="
+		client := &http.Client{}
+		req, err := http.NewRequest("GET", BaseLink, nil)
+		if err != nil {
+			return nil, err
+		}
+		resp, err := client.Do(req)
+		if err != nil {
+			return nil, err
+		}
+		defer resp.Body.Close()
+		body, err := io.ReadAll(resp.Body)
+		if err != nil {
+			return nil, err
+		}
+		// write to file
+		fileName := path.Join("./", "data", "downloads", Attachment.Name)
+		err = os.WriteFile(fileName, body, 0644)
+		if err != nil {
+			return nil, err
+		}
+	}
+	return []string{}, nil
+
+}
 func (tpc TmailPlusClient) NewAccount() Account {
 	username := gofakeit.Username()
 	rand.Seed(time.Now().UnixNano())

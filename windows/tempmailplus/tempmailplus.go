@@ -2,6 +2,7 @@ package tempmailplus
 
 import (
 	"fmt"
+	"strconv"
 	"time"
 
 	"guiv1/misc"
@@ -79,7 +80,6 @@ func RaidWindow(a fyne.App, w fyne.Window) {
 
 	EmailMessages := container.NewVBox()
 	EmailMessages.Layout = layout.NewVBoxLayout()
-	// EmailMessages.Layout = layout.NewStackLayout()
 	MessagesScroll := container.NewScroll(EmailMessages)
 	MessagesScroll.Resize(fyne.NewSize(600, 400))
 	MessagesScroll.SetMinSize(fyne.NewSize(600, 400))
@@ -121,7 +121,6 @@ func RaidWindow(a fyne.App, w fyne.Window) {
 			LatestMessage := messages[0]
 			DetailedMessage := EmailClient.GetMessageByID(LatestMessage.MailId)
 			NewEmailElement := EmailElement(DetailedMessage)
-			// check if the email element is already in the EmailMessages container
 			EmailMessages.Add(NewEmailElement)
 
 			sep := widget.NewLabel("")
@@ -144,9 +143,13 @@ func RaidWindow(a fyne.App, w fyne.Window) {
 				LatestMessage := messages[0]
 				DetailedMessage := EmailClient.GetMessageByID(LatestMessage.MailId)
 				NewEmailElement := EmailElement(DetailedMessage)
-				// check if the email element is already in the EmailMessages container
 				EmailMessages.Add(NewEmailElement)
-				// extraction notification
+				if len(DetailedMessage.Attachments) > 0 {
+					f_.YesorNo(w, "Attachments Found ["+strconv.Itoa(len(DetailedMessage.Attachments))+"]", "Do you want to download the attachments?", func() {
+						fmt.Println("Downloading attachments...")
+						EmailClient.DownloadAttachments(DetailedMessage)
+					})
+				}
 				f_.NotificationModal(w, &misc.ChatApp{}, "Info", "Extracting verification information from the latest email...")
 				verifObj, err := verif.ExtractVerificationInfo(DetailedMessage.Html)
 				if err != nil {

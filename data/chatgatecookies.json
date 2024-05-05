@@ -21,7 +21,7 @@
         "secure": false,
         "session": true,
         "storeId": "0",
-        "value": "fd%3D2024-05-03%2018%3A01%3A49%7C%7C%7Cep%3Dhttps%3A%2F%2Fchatgate.ai%2F%7C%7C%7Crf%3Dhttps%3A%2F%2Fpypi.org%2F"
+        "value": "fd%3D2024-05-05%2015%3A43%3A11%7C%7C%7Cep%3Dhttps%3A%2F%2Fchatgate.ai%2F%7C%7C%7Crf%3D%28none%29"
     },
     {
         "domain": ".chatgate.ai",
@@ -33,7 +33,7 @@
         "secure": false,
         "session": true,
         "storeId": "0",
-        "value": "fd%3D2024-05-03%2018%3A01%3A49%7C%7C%7Cep%3Dhttps%3A%2F%2Fchatgate.ai%2F%7C%7C%7Crf%3Dhttps%3A%2F%2Fpypi.org%2F"
+        "value": "fd%3D2024-05-05%2015%3A43%3A11%7C%7C%7Cep%3Dhttps%3A%2F%2Fchatgate.ai%2F%7C%7C%7Crf%3D%28none%29"
     },
     {
         "domain": ".chatgate.ai",
@@ -45,7 +45,7 @@
         "secure": false,
         "session": true,
         "storeId": "0",
-        "value": "typ%3Dreferral%7C%7C%7Csrc%3Dpypi.org%7C%7C%7Cmdm%3Dreferral%7C%7C%7Ccmp%3D%28none%29%7C%7C%7Ccnt%3D%2F%7C%7C%7Ctrm%3D%28none%29%7C%7C%7Cid%3D%28none%29"
+        "value": "typ%3Dtypein%7C%7C%7Csrc%3D%28direct%29%7C%7C%7Cmdm%3D%28none%29%7C%7C%7Ccmp%3D%28none%29%7C%7C%7Ccnt%3D%28none%29%7C%7C%7Ctrm%3D%28none%29%7C%7C%7Cid%3D%28none%29"
     },
     {
         "domain": ".chatgate.ai",
@@ -57,7 +57,7 @@
         "secure": false,
         "session": true,
         "storeId": "0",
-        "value": "typ%3Dreferral%7C%7C%7Csrc%3Dpypi.org%7C%7C%7Cmdm%3Dreferral%7C%7C%7Ccmp%3D%28none%29%7C%7C%7Ccnt%3D%2F%7C%7C%7Ctrm%3D%28none%29%7C%7C%7Cid%3D%28none%29"
+        "value": "typ%3Dtypein%7C%7C%7Csrc%3D%28direct%29%7C%7C%7Cmdm%3D%28none%29%7C%7C%7Ccmp%3D%28none%29%7C%7C%7Ccnt%3D%28none%29%7C%7C%7Ctrm%3D%28none%29%7C%7C%7Cid%3D%28none%29"
     },
     {
         "domain": ".chatgate.ai",
@@ -73,7 +73,7 @@
     },
     {
         "domain": ".chatgate.ai",
-        "expirationDate": 1714776724,
+        "expirationDate": 1714946287,
         "hostOnly": false,
         "httpOnly": false,
         "name": "sbjs_session",
@@ -82,11 +82,11 @@
         "secure": false,
         "session": false,
         "storeId": "0",
-        "value": "pgs%3D16%7C%7C%7Ccpg%3Dhttps%3A%2F%2Fchatgate.ai%2Fmy-account%2F"
+        "value": "pgs%3D1%7C%7C%7Ccpg%3Dhttps%3A%2F%2Fchatgate.ai%2F"
     },
     {
         "domain": ".chatgate.ai",
-        "expirationDate": 1749334924.605265,
+        "expirationDate": 1749504488.121681,
         "hostOnly": false,
         "httpOnly": false,
         "name": "tk_ai",
@@ -95,11 +95,11 @@
         "secure": false,
         "session": false,
         "storeId": "0",
-        "value": "6P3T%2FXKnYLZhueN46z7Sq5cv"
+        "value": "F1BwsZvOs90Qek%2BSj5RM8yk5"
     },
     {
         "domain": "chatgate.ai",
-        "expirationDate": 1716027717.054396,
+        "expirationDate": 1716197285.783326,
         "hostOnly": true,
         "httpOnly": true,
         "name": "wordpress_sec_9a8088c047aa8a4d022063748baad4c8",
@@ -108,7 +108,7 @@
         "secure": true,
         "session": false,
         "storeId": "0",
-        "value": "rerards101.r3x.1337_x2%7C1715984516%7CY6Mia5YjQhjT9Jzjr9iXpkUDVi5hZ5n9IXLGFdFu8rl%7C45414072daf1d2138e038d54a8ad7275e0a0748eb8d18bbc6614c3306b248fcd"
+        "value": "remoma1990pxd%7C1716154085%7COxdqSKsZLxixYEDwLnHo4tdGDVtDMNUUvNSZ17TTe8V%7C5c90cb978e43774f13752d5a21d2db8b5667755e18774af8efe1f4c0b411ccd3"
     },
     {
         "domain": "chatgate.ai",
@@ -120,23 +120,11 @@
         "secure": false,
         "session": true,
         "storeId": "0",
-        "value": "6635268e3529a"
+        "value": "6637a90e63e8b"
     },
     {
         "domain": "chatgate.ai",
-        "hostOnly": true,
-        "httpOnly": false,
-        "name": "wordpress_test_cookie",
-        "path": "/",
-        "sameSite": "unspecified",
-        "secure": true,
-        "session": true,
-        "storeId": "0",
-        "value": "WP%20Cookie%20check"
-    },
-    {
-        "domain": "chatgate.ai",
-        "expirationDate": 1716027717.054525,
+        "expirationDate": 1716197285.783433,
         "hostOnly": true,
         "httpOnly": true,
         "name": "wordpress_logged_in_9a8088c047aa8a4d022063748baad4c8",
@@ -145,11 +133,11 @@
         "secure": true,
         "session": false,
         "storeId": "0",
-        "value": "rerards101.r3x.1337_x2%7C1715984516%7CY6Mia5YjQhjT9Jzjr9iXpkUDVi5hZ5n9IXLGFdFu8rl%7Ce73d9020d0717167d51a825671243510274a8d95782d09fa2b5bdecb7d3370e9"
+        "value": "remoma1990pxd%7C1716154085%7COxdqSKsZLxixYEDwLnHo4tdGDVtDMNUUvNSZ17TTe8V%7Cb869c57c901140ab0689f664e734e3a2fecae8eeba8bafd3cae69be4042c52cd"
     },
     {
         "domain": "chatgate.ai",
-        "expirationDate": 1716027717.054494,
+        "expirationDate": 1716197285.783408,
         "hostOnly": true,
         "httpOnly": true,
         "name": "wordpress_sec_9a8088c047aa8a4d022063748baad4c8",
@@ -158,11 +146,11 @@
         "secure": true,
         "session": false,
         "storeId": "0",
-        "value": "rerards101.r3x.1337_x2%7C1715984516%7CY6Mia5YjQhjT9Jzjr9iXpkUDVi5hZ5n9IXLGFdFu8rl%7C45414072daf1d2138e038d54a8ad7275e0a0748eb8d18bbc6614c3306b248fcd"
+        "value": "remoma1990pxd%7C1716154085%7COxdqSKsZLxixYEDwLnHo4tdGDVtDMNUUvNSZ17TTe8V%7C5c90cb978e43774f13752d5a21d2db8b5667755e18774af8efe1f4c0b411ccd3"
     },
     {
         "domain": "widgets.wp.com",
-        "expirationDate": 1714778524.612002,
+        "expirationDate": 1714948088.191294,
         "hostOnly": true,
         "httpOnly": false,
         "name": "wpcom-thirdparty-cookie-check",

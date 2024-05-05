@@ -141,7 +141,7 @@ func NewChatApp() *ChatApp {
 			f_.NotificationModal(w, &misc.ChatApp{a, w, input, chatLog}, "HTTP Server Error", "The HTTP server is not running ")
 			return
 		}
-		// <-httpserver.ProcStop
+		<-httpserver.ProcStop
 		close(httpserver.ProcStop)
 		// httpserver.WaitGroup.Done()
 		HttpServerStatus = "Stopped"
