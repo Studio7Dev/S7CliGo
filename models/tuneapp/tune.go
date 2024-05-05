@@ -2,13 +2,13 @@ package tuneapp
 
 import (
 	"bufio"
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"guiv1/misc"
 	"io"
 	"log"
 	"net/http"
-	"strconv"
 	"strings"
 
 	"github.com/google/uuid"
@@ -87,6 +87,17 @@ func (c TuneClient) NewChat(model_name string) string {
 	return chat_id
 }
 
+type TuneMessage struct {
+	Query          string `json:"query"`
+	ConversationID string `json:"conversation_id"`
+	ModelID        string `json:"model_id"`
+	BrowseWeb      bool   `json:"browseWeb"`
+	Attachment     string `json:"attachment"`
+	AttachmentName string `json:"attachment_name"`
+	MessageID      string `json:"messageId"`
+	PrevMessageID  string `json:"prevMessageId"`
+}
+
 func (c TuneClient) SendMessage(message string, chat_id string, model string, internet bool, raw bool, PrevMsgId string, UsrPrevMsgid string) (http.Response, error) {
 	if AccessToken == "" {
 		AccessToken = AccessToken_New
@@ -97,9 +108,24 @@ func (c TuneClient) SendMessage(message string, chat_id string, model string, in
 	if UsrPrevMsgid == "" {
 		UsrPrevMsgid = c.NewUuid()
 	}
+
+	var messageData = TuneMessage{
+		Query:          message,
+		ConversationID: chat_id,
+		ModelID:        model,
+		BrowseWeb:      internet,
+		Attachment:     "",
+		AttachmentName: "",
+		MessageID:      c.NewUuid(),
+		PrevMessageID:  PrevMsgId,
+	}
+	jsonData, err := json.Marshal(messageData)
+	if err != nil {
+		return http.Response{}, err
+	}
 	client := &http.Client{}
-	var data = strings.NewReader(`{"query":"` + message + `","conversation_id":"` + chat_id + `","model_id":"` + model + `","browseWeb":` + strconv.FormatBool(internet) + `,"attachement":"","attachment_name":"","messageId":"` + c.NewUuid() + `","prevMessageId":"` + PrevMsgId + `"}`)
-	req, err := http.NewRequest("POST", "https://chat.tune.app/api/prompt", data)
+	//var data = strings.NewReader(`{"query":"` + message + `","conversation_id":"` + chat_id + `","model_id":"` + model + `","browseWeb":` + strconv.FormatBool(internet) + `,"attachement":"","attachment_name":"","messageId":"` + c.NewUuid() + `","prevMessageId":"` + PrevMsgId + `"}`)
+	req, err := http.NewRequest("POST", "https://chat.tune.app/api/prompt", bytes.NewBuffer(jsonData))
 	if err != nil {
 		log.Fatal(err)
 	}

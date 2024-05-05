@@ -17,6 +17,7 @@ import (
 	"guiv1/windows/hastebin"
 	"guiv1/windows/imagegen"
 	"guiv1/windows/mailgw"
+	"guiv1/windows/tempmailplus"
 
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/app"
@@ -579,6 +580,10 @@ func ToolMenu(w fyne.Window, a fyne.App) {
 	newMailGw := widget.NewButton("New Mail.Gw", func() {
 		mailgw.RaidWindow(a, w)
 	})
+	newTpc := widget.NewButton("New Tempmail.plus", func() {
+		tempmailplus.RaidWindow(a, w)
+	})
+	newTpc.SetIcon(icns.Icons8("256", "gmail--v1.png", ""))
 	newMailGw.SetIcon(icns.Icons8("256", "gmail--v1.png", ""))
 	modelMenu := container.NewVBox(
 		container.NewHBox(
@@ -593,6 +598,7 @@ func ToolMenu(w fyne.Window, a fyne.App) {
 		),
 		newHaste,
 		newMailGw,
+		newTpc,
 	)
 
 	popup := widget.NewModalPopUp(modelMenu, w.Canvas())
