@@ -302,3 +302,26 @@ func (f Funcs) NotificationModal(w fyne.Window, a *ChatApp, title string, messag
 	popup.Resize(fyne.NewSize(300, 150))
 	popup.Show()
 }
+
+func (f Funcs) CNotificationModal(w fyne.Window, a *ChatApp, title string, message string) {
+	title_element := widget.NewRichTextFromMarkdown(fmt.Sprintf("# %s", title))
+
+	notification := container.NewBorder(
+		title_element,
+		container.NewVBox(
+			widget.NewRichTextFromMarkdown(message),
+			widget.NewButton("OK", nil),
+		),
+		nil,
+		nil,
+	)
+	popup := widget.NewModalPopUp(notification, w.Canvas())
+	popup.CreateRenderer().Layout(notification.Size())
+	OKBtn := notification.Objects[1].(*fyne.Container).Objects[1].(*widget.Button)
+	OKBtn.SetIcon(IconUtil{}.Icons8("256", "checkmark--v1.png", ""))
+	OKBtn.OnTapped = func() {
+		popup.Hide()
+	}
+	popup.Resize(fyne.NewSize(300, 150))
+	popup.Show()
+}

@@ -2,6 +2,7 @@ package huggingface
 
 import (
 	"bufio"
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"guiv1/misc"
@@ -121,10 +122,31 @@ func (s *ChatClient) ChangeModel(model string) string {
 	return string(fmt.Sprint(convId))
 }
 
+type MessageData struct {
+	Inputs     string `json:"inputs"`
+	Id         string `json:"id"`
+	IsRetry    bool   `json:"is_retry"`
+	IsContinue bool   `json:"is_continue"`
+	WebSearch  bool   `json:"web_search"`
+	Files      []any  `json:"files"`
+}
+
 func (c *ChatClient) SendMessage(message string, convId string, Id string, raw bool) (error, http.Response) {
-	fmt.Println(message, convId, Id)
-	data := strings.NewReader(fmt.Sprintf(`{"inputs":"%s","id":"%s","is_retry":false,"is_continue":false,"web_search":false,"files":[]}`, message, Id))
-	req, err := http.NewRequest("POST", "https://huggingface.co/chat/conversation/"+convId, data)
+	//fmt.Println(message, convId, Id)
+	//data := strings.NewReader(fmt.Sprintf(`{"inputs":"%s","id":"%s","is_retry":false,"is_continue":false,"web_search":false,"files":[]}`, message, Id))
+	var messageData = MessageData{
+		Inputs:     message,
+		Id:         Id,
+		IsRetry:    false,
+		IsContinue: false,
+		WebSearch:  false,
+		Files:      []any{},
+	}
+	jsonData, err := json.Marshal(messageData)
+	if err != nil {
+		return err, http.Response{}
+	}
+	req, err := http.NewRequest("POST", "https://huggingface.co/chat/conversation/"+convId, bytes.NewBuffer(jsonData))
 	if err != nil {
 		return err, http.Response{}
 	}

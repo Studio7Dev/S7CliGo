@@ -1,9 +1,7 @@
 {
-	"folders": [
-		{
-			"name": "GuiV1",
-			"path": "../.."
-		}
-	],
-	"settings": {}
+    "folders": [
+        {
+            "path": "../.."
+        }
+    ]
 }

@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"guiv1/misc"
+	"guiv1/parsers/verif"
 
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/container"
@@ -87,8 +88,10 @@ func RaidWindow(a fyne.App, w fyne.Window) {
 	Email := Account.Address
 	ID := Account.ID
 	Password := Account.Password
+
 	EmailAccountDetails := container.NewVBox(
-		widget.NewRichTextFromMarkdown(fmt.Sprintf(`# Temp Mail Account Details
+		widget.NewRichTextFromMarkdown(fmt.Sprintf(`
+		# Temp Mail Account Details
 		**Email:** %s
 		**ID:** %s
 		**Password:** %s
@@ -149,6 +152,7 @@ func RaidWindow(a fyne.App, w fyne.Window) {
 			NewEmailElement := EmailElement(DetailedMessage)
 			// check if the email element is already in the EmailMessages container
 			EmailMessages.Add(NewEmailElement)
+
 			sep := widget.NewLabel("")
 			EmailMessages.Add(sep)
 			EmailMessages.Refresh()
@@ -158,6 +162,7 @@ func RaidWindow(a fyne.App, w fyne.Window) {
 		}
 
 	})
+
 	EmailAccountDetails.Add(RefreshBtn)
 	go func() {
 		for {
@@ -172,6 +177,25 @@ func RaidWindow(a fyne.App, w fyne.Window) {
 				NewEmailElement := EmailElement(DetailedMessage)
 				// check if the email element is already in the EmailMessages container
 				EmailMessages.Add(NewEmailElement)
+				// extraction notification
+				f_.NotificationModal(w, &misc.ChatApp{}, "Info", "Extracting verification information from the latest email...")
+				verifObj, err := verif.ExtractVerificationInfo(DetailedMessage.Html[0])
+				if err != nil {
+					verifObj, err = verif.ExtractVerificationInfo(DetailedMessage.Text)
+					if err != nil {
+						f_.NotificationModal(w, &misc.ChatApp{}, "Error", "Failed to extract verification information from email")
+						break
+						return
+					}
+				}
+				Info := fmt.Sprintf(`
+				### VerificationCode: %s
+				### AccountUsername: %s
+				### Instructions: %s
+				### ExpirationTime: %s
+				### Verification Link: %s`, verifObj.VerificationCode, verifObj.AccountUsername, verifObj.Instructions, verifObj.ExpirationTime, verifObj.VerificationURL)
+				clipboard.Write(clipboard.FmtText, []byte(Info))
+				f_.CNotificationModal(w, &misc.ChatApp{}, "Verification Info Copied to Clipboard", Info)
 				sep := widget.NewLabel("")
 				EmailMessages.Add(sep)
 				EmailMessages.Refresh()
