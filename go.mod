@@ -6,6 +6,7 @@ require (
 	fyne.io/fyne/v2 v2.4.5
 	fyne.io/x/fyne v0.0.0-20240421102438-d5a080914907
 	github.com/JohannesKaufmann/html-to-markdown v1.5.0
+	github.com/brianvoe/gofakeit/v6 v6.28.0
 	github.com/dlclark/regexp2 v1.11.0
 	github.com/felixstrobel/mailtm v0.3.0
 	github.com/go-rod/rod v0.115.0
@@ -31,7 +32,6 @@ require (
 	github.com/andybalholm/brotli v1.1.0 // indirect
 	github.com/andybalholm/cascadia v1.3.2 // indirect
 	github.com/aymerick/douceur v0.2.0 // indirect
-	github.com/brianvoe/gofakeit/v6 v6.28.0 // indirect
 	github.com/cloudflare/circl v1.3.7 // indirect
 	github.com/dchest/jsmin v0.0.0-20220218165748-59f39799265f // indirect
 	github.com/go-task/slim-sprig v0.0.0-20230315185526-52ccab3ef572 // indirect

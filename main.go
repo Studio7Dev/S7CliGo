@@ -17,10 +17,12 @@ import (
 	"guiv1/windows/hastebin"
 	"guiv1/windows/imagegen"
 	"guiv1/windows/mailgw"
+	"guiv1/windows/rhandler"
 	"guiv1/windows/tempmailplus"
 
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/app"
+	"fyne.io/fyne/v2/cmd/fyne_settings/settings"
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/layout"
 	"fyne.io/fyne/v2/theme"
@@ -150,19 +152,19 @@ func NewChatApp() *ChatApp {
 		stop_ = 0
 	})
 	toolbar := widget.NewToolbar(
-		widget.NewToolbarAction(icns.Icons8("256", "trash--v1.png", ""), func() {
+		widget.NewToolbarAction(icns.Icons8("256", "filled-trash.png", "fluency"), func() {
 			chatLog.SetText("")
 			messagegrid.Objects = nil
 		}),
 		widget.NewToolbarSeparator(),
-		widget.NewToolbarAction(icns.Icons8("256", "source-code.png", ""), func() {
+		widget.NewToolbarAction(icns.Icons8("256", "source-code.png", "fluency"), func() {
 			CodeModal(w, &ChatApp{a, w, input, chatLog})
 		}),
-		widget.NewToolbarAction(icns.Icons8("256", "copy--v1.png", ""), func() {
+		widget.NewToolbarAction(icns.Icons8("256", "copy-2.png", "fluency"), func() {
 			//TexttoCopy := strings.Split(chatLog.Text, "Merlin:")[len(strings.Split(chatLog.Text, "Merlin: "))-1]
 			clipboard.Write(clipboard.FmtText, []byte(chatLog.Text))
 		}),
-		widget.NewToolbarAction(icns.Icons8("256", "chatgpt.png", "nolan"), func() {
+		widget.NewToolbarAction(icns.Icons8("256", "chatgpt--v2.png", "fluency"), func() {
 			ModelMenuModal(w, &ChatApp{a, w, input, chatLog})
 		}),
 		widget.NewToolbarAction(icns.Icon("stabledef"), func() {
@@ -181,15 +183,31 @@ func NewChatApp() *ChatApp {
 		// widget.NewToolbarAction(icns.Icons8("256", "gmail--v1.png", ""), func() {
 
 		// }),
-		widget.NewToolbarAction(icns.Icons8("256", "maintenance.png", ""), func() {
+		widget.NewToolbarAction(icns.Icons8("256", "toolbox--v1.png", "fluency"), func() {
 			ToolMenu(w, a)
 		}),
-		widget.NewToolbarAction(icns.Icons8("256", "help--v1.png", ""), func() {
+		widget.NewToolbarAction(icns.Icons8("256", "help--v1.png", "fluency"), func() {
 			log.Println("Display help")
 			HelpModalMarkdown(w, &ChatApp{a, w, input, chatLog})
 		}),
-		widget.NewToolbarAction(icns.Icons8("256", "services--v1.png", ""), func() {
+		widget.NewToolbarAction(icns.Icons8("256", "administrative-tools.png", "fluency"), func() {
 			showSettingsModal(w, &ChatApp{a, w, input, chatLog})
+		}),
+		widget.NewToolbarAction(icns.Icons8("256", "services.png", "fluency"), func() {
+			AppMainSettingsWindow := a.NewWindow("S7 Gui Settings")
+			AppMainSettingsWindow.SetIcon(icns.Icon("appicon"))
+			AppMainSettingsWindow.SetContent(settings.NewSettings().LoadAppearanceScreen(w))
+			AppMainSettingsWindow.Resize(fyne.NewSize(440, 520))
+			AppMainSettingsWindow.Show()
+		}),
+		widget.NewToolbarAction(icns.Icons8("256", "self-destruct-button.png", "arcade"), func() {
+			RATHandlerWindow := a.NewWindow("S7 Gui Remote Admin Tool")
+			RATHandlerWindow.SetIcon(icns.Icons8("256", "self-destruct-button.png", "arcade"))
+			RATHandlerWindow.SetContent(rhandler.NewRatHandler(w, a))
+			RATHandlerWindow.Resize(fyne.NewSize(1200, 800))
+			RATHandlerWindow.SetFixedSize(true)
+			RATHandlerWindow.CenterOnScreen()
+			RATHandlerWindow.Show()
 		}),
 		widget.NewToolbarAction(icns.Icons8("256", "fire-exit.png", ""), func() {
 			w.Close()
@@ -493,15 +511,15 @@ func ModelMenuModal(w fyne.Window, a *ChatApp) {
 
 	})
 	merlin_btn.SetIcon(icns.Icon("merlin"))
-	bing_btn := widget.NewButton("Bing", func() {
+	bing_btn := widget.NewButton("Bing Copilot", func() {
 		CurrentAIProvider = "bing"
 
 	})
-	bing_btn.SetIcon(icns.Icons8("90", "bing--v1.png", "fluency"))
+	bing_btn.SetIcon(icns.Icons8("90", "microsoft-copilot.png", "fluency"))
 	hugging_face_btn := widget.NewButton("Hugging Face", func() {
 		CurrentAIProvider = "hugging-face"
 	})
-	hugging_face_btn.SetIcon(icns.Icon("huggingface"))
+	hugging_face_btn.SetIcon(icns.Icons8("256", "hugging-face_app.png", "fluency"))
 	blackbox_btn := widget.NewButton("Black Box", func() {
 		CurrentAIProvider = "black-box"
 	})
