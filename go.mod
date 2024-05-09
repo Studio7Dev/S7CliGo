@@ -11,6 +11,8 @@ require (
 	github.com/felixstrobel/mailtm v0.3.0
 	github.com/go-rod/rod v0.115.0
 	github.com/go-rod/stealth v0.4.9
+	github.com/goftp/file-driver v0.0.0-20180502053751-5d604a0fc0c9
+	github.com/goftp/server v0.0.0-20200708154336-f64f7c2d8a42
 	github.com/google/uuid v1.6.0
 	github.com/huandu/go-clone/generic v1.7.2
 	github.com/imroc/req/v3 v3.43.3
@@ -40,6 +42,7 @@ require (
 	github.com/hashicorp/errwrap v1.1.0 // indirect
 	github.com/hashicorp/go-multierror v1.1.1 // indirect
 	github.com/huandu/go-clone v1.6.0 // indirect
+	github.com/jlaffaye/ftp v0.2.0 // indirect
 	github.com/jolestar/go-commons-pool/v2 v2.1.2 // indirect
 	github.com/josephspurrier/goversioninfo v1.4.0 // indirect
 	github.com/klauspost/compress v1.17.7 // indirect

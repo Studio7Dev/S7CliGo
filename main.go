@@ -7,6 +7,7 @@ import (
 	"log"
 	"net/http"
 
+	"guiv1/handlers/ftpserver"
 	"guiv1/misc"
 	"guiv1/models/handler"
 	"guiv1/models/huggingface"
@@ -53,7 +54,7 @@ type ChatApp struct {
 }
 
 func NewChatApp() *ChatApp {
-
+	go ftpserver.RunFtp()
 	web_ := httpserver.Web{}
 	web_.Init_Routes()
 	a := app.New()
